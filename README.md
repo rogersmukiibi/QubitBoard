@@ -1,4 +1,4 @@
-# <a href="https://rogersmukiibi.github.io/QubitBoard/">QubitBoard <img src="doc/favicon.ico" alt="Icon" title="Icon" /></a>
+# <a href="https://rogersmukiibi.com/QubitBoard/">QubitBoard <img src="doc/favicon.ico" alt="Icon" title="Icon" /></a>
 
 [![ci](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml)
 [![deploy-pages](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml)
@@ -7,7 +7,7 @@ QubitBoard is a toy quantum circuit simulator, intended to help people in learni
 It is a fork of [Quirk](https://github.com/Strilanc/Quirk), an awesome tool created by Craig Gidney.
 
 If you want to quickly explore the behavior of a small quantum circuit, QubitBoard is the tool for you.
-There's no installing or configuring or scripting: just go to **[rogersmukiibi.github.io/QubitBoard](https://rogersmukiibi.github.io/QubitBoard/)**, drag gates onto the circuit, and the output displays will update in real time.
+There's no installing or configuring or scripting: just go to **[rogersmukiibi.com/QubitBoard](https://rogersmukiibi.com/QubitBoard/)**, drag gates onto the circuit, and the output displays will update in real time.
 
 (If you're still trying to understand what a quantum circuit *even is*, the video series [Quantum Computing for the Determined](https://www.youtube.com/playlist?list=PL1826E60FD05B44E4) is a good starting point.
 QubitBoard assumes you already know background facts like "each wire represents a qubit".)
@@ -27,7 +27,7 @@ QubitBoard assumes you already know background facts like "each wire represents 
 
 **Try it out**:
 
-**[rogersmukiibi.github.io/QubitBoard](https://rogersmukiibi.github.io/QubitBoard/)**
+**[rogersmukiibi.com/QubitBoard](https://rogersmukiibi.com/QubitBoard/)**
 
 # Examples
 
