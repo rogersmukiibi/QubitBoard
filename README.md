@@ -82,8 +82,9 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 # Deployment
 
 Pushes to `master` are built and published to GitHub Pages automatically by
-[`.github/workflows/pages.yml`](.github/workflows/pages.yml). The workflow runs the same
-`npm run build` as above and serves the resulting single-file page as `index.html`.
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). The workflow runs the same `npm run build` as above and publishes `out/qubitboard.html` as the site's `index.html`.
+
+
 
 # Credits
 
