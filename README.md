@@ -51,7 +51,7 @@ If you want to modify Quirk, this is how you get the code and turn your changes 
     
     `sudo apt-get update`
     
-    `sudo apt-get install --yes git npm nodejs-legacy`
+    `sudo apt-get install --yes git npm nodejs build-essential`
 
 2. Clone the repository.
 
