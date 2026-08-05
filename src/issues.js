@@ -29,7 +29,7 @@ function doDetectIssues() {
     if (detectWebGlNotSupported()) {
         notifyAboutKnownIssue(
             "Can't simulate circuits. Your browser doesn't support WebGL, or has it disabled.",
-            "https://github.com/rogersmukiibi/QubitBoard/issues?q=is%3Aissue+webgl",
+            "https://github.com/rogersmukiibi/QubitBoard/issues/1",
             [/Computing circuit values failed/, /Error creating WebGL context./])
     }
 }

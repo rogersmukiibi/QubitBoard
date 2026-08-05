@@ -16,9 +16,29 @@
 
 const puppeteer = require('puppeteer');
 
+// Set PUPPETEER_NO_SANDBOX=1 when running inside a container that can't use Chromium's sandbox.
+const launchOptions = process.env.PUPPETEER_NO_SANDBOX ? {args: ['--no-sandbox']} : {};
+
+// If the browser dies mid-run, the awaits below never settle and node would otherwise exit 0
+// with no tests having run. Treat any exit that didn't reach the end of the run as a failure.
+let reachedEndOfRun = false;
+process.on('exit', code => {
+    if (!reachedEndOfRun && code === 0) {
+        console.error("PuppeteerRunTests.js exited before the test run finished.");
+        process.exitCode = 1;
+    }
+});
+
 (async () => {
     try {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch(launchOptions);
+        browser.on('disconnected', () => {
+            if (!reachedEndOfRun) {
+                console.error("Browser disconnected before the test run finished.");
+                process.exit(1);
+            }
+        });
+
         const page = await browser.newPage();
         let caughtPageError = false;
         page.on('console', message => console.log(message.text()));
@@ -30,12 +50,24 @@ const puppeteer = require('puppeteer');
         const outDirUrl = 'file:///' + __dirname.split('\\').join('/') + '/out/';
         await page.goto(outDirUrl + 'test.html#blocking');
         await page.waitForSelector('#done', {timeout: 5 * 60 * 1000});
-        let anyFailures = await page.evaluate('__any_failures');
+        let {total, done, anyFailures} = await page.evaluate(() => ({
+            total: __total_tests,
+            done: __total_done,
+            anyFailures: __any_failures
+        }));
 
+        reachedEndOfRun = true;
         await browser.close();
+
+        // A run that reported no tests, or stopped short, is a failure even when nothing failed.
+        if (total === 0 || done !== total) {
+            console.error(`Expected a full test run, but only ${done}/${total} tests reported.`);
+            process.exit(1);
+        }
         if (anyFailures || caughtPageError) {
             process.exit(1);
         }
+        console.log(`All ${total} tests passed.`);
     } catch (ex) {
         console.error("Error bubbled up into PuppeteerRunTests.js: " + ex);
         process.exit(1);
