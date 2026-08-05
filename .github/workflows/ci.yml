@@ -3,6 +3,10 @@ on: [push, pull_request]
 jobs:
   build-and-run-unit-tests:
     runs-on: ubuntu-latest
+    env:
+      # ubuntu-latest restricts unprivileged user namespaces, which the bundled Chromium
+      # needs for its sandbox. The runner is ephemeral and only loads our own build.
+      PUPPETEER_NO_SANDBOX: '1'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -14,6 +18,8 @@ jobs:
     - run: node PuppeteerRunTests.js
   screenshot-circuit:
     runs-on: ubuntu-latest
+    env:
+      PUPPETEER_NO_SANDBOX: '1'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4

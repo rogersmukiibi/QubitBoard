@@ -16,9 +16,12 @@
 
 const puppeteer = require('puppeteer');
 
+// Set PUPPETEER_NO_SANDBOX=1 when running inside a container that can't use Chromium's sandbox.
+const launchOptions = process.env.PUPPETEER_NO_SANDBOX ? {args: ['--no-sandbox']} : {};
+
 (async () => {
     try {
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch(launchOptions);
         const page = await browser.newPage();
         let caughtPageError = false;
         page.on('console', message => console.log(message.text()));
