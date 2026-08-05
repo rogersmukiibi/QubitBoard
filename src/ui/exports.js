@@ -137,11 +137,11 @@ function initExports(revision, mostRecentStats, obsIsAnyOverlayShowing) {
             try {
                 let circuitDef = fromJsonText_CircuitDefinition(jsonText);
                 if (!circuitDef.isEmpty()) {
-                    return `Quirk with Circuit - ${circuitDef.readableHash()}.html`;
+                    return `QubitBoard with Circuit - ${circuitDef.readableHash()}.html`;
                 }
             } catch (_) {
             }
-            return 'Quirk.html';
+            return 'QubitBoard.html';
         };
 
         let latest;
@@ -155,7 +155,7 @@ function initExports(revision, mostRecentStats, obsIsAnyOverlayShowing) {
             setTimeout(() => {
                 downloadButton.disabled = false;
             }, 1000);
-            let originalHtml = document.QUIRK_QUINE_ALL_HTML_ORIGINAL;
+            let originalHtml = document.QUBITBOARD_QUINE_ALL_HTML_ORIGINAL;
 
             // Inject default circuit.
             let startDefaultTag = '//DEFAULT_CIRCUIT_START\n';

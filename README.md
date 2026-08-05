@@ -1,14 +1,16 @@
-# <a href="http://algassert.com/quirk">Quirk <img src="doc/favicon.ico" alt="Icon" title="Icon" /></a>
+# <a href="https://rogersmukiibi.github.io/QubitBoard/">QubitBoard <img src="doc/favicon.ico" alt="Icon" title="Icon" /></a>
 
-[![Build Status](https://travis-ci.org/Strilanc/Quirk.svg?branch=master)](https://travis-ci.org/Strilanc/Quirk)
+[![ci](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml)
+[![deploy-pages](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml)
 
-Quirk is a toy quantum circuit simulator, intended to help people in learning about quantum computing.
+QubitBoard is a toy quantum circuit simulator, intended to help people in learning about quantum computing.
+It is a fork of [Quirk](https://github.com/Strilanc/Quirk), an awesome tool created by Craig Gidney.
 
-If you want to quickly explore the behavior of a small quantum circuit, Quirk is the tool for you.
-There's no installing or configuring or scripting: just go to **[algassert.com/quirk](http://algassert.com/quirk)**, drag gates onto the circuit, and the output displays will update in real time.
+If you want to quickly explore the behavior of a small quantum circuit, QubitBoard is the tool for you.
+There's no installing or configuring or scripting: just go to **[rogersmukiibi.github.io/QubitBoard](https://rogersmukiibi.github.io/QubitBoard/)**, drag gates onto the circuit, and the output displays will update in real time.
 
-(If you're still trying to understand what a quantum circuit *even is*, then I recommend the video series [Quantum Computing for the Determined](https://www.youtube.com/playlist?list=PL1826E60FD05B44E4).
-Quirk assumes you already know background facts like "each wire represents a qubit".)
+(If you're still trying to understand what a quantum circuit *even is*, the video series [Quantum Computing for the Determined](https://www.youtube.com/playlist?list=PL1826E60FD05B44E4) is a good starting point.
+QubitBoard assumes you already know background facts like "each wire represents a qubit".)
 
 **Defining features**:
 
@@ -25,7 +27,7 @@ Quirk assumes you already know background facts like "each wire represents a qub
 
 **Try it out**:
 
-**[algassert.com/quirk](http://algassert.com/quirk)**
+**[rogersmukiibi.github.io/QubitBoard](https://rogersmukiibi.github.io/QubitBoard/)**
 
 # Examples
 
@@ -43,24 +45,24 @@ Quirk assumes you already know background facts like "each wire represents a qub
 
 # Building
 
-If you want to modify Quirk, this is how you get the code and turn your changes into working html/javascript.
+If you want to modify QubitBoard, this is how you get the code and turn your changes into working html/javascript.
 
 1. Have [git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/download/) installed.
 
     `sudo add-apt-repository universe`
-    
+
     `sudo apt-get update`
-    
+
     `sudo apt-get install --yes git npm nodejs build-essential`
 
 2. Clone the repository.
 
-    `git clone https://github.com/Strilanc/Quirk.git`
+    `git clone https://github.com/rogersmukiibi/QubitBoard.git`
 
 3. Install the dev dependencies.
 
-    `cd Quirk`
-    
+    `cd QubitBoard`
+
     `npm install`
 
 4. (*Optional*) Make your changes. Run the tests.
@@ -71,12 +73,24 @@ If you want to modify Quirk, this is how you get the code and turn your changes 
 
     `npm run build`
 
-6. Confirm the output works by opening `out/quirk.html` with a web browser.
+6. Confirm the output works by opening `out/qubitboard.html` with a web browser.
 
-    `firefox out/quirk.html`
+    `firefox out/qubitboard.html`
 
-7. Copy `out/quirk.html` to wherever you want.
+7. Copy `out/qubitboard.html` to wherever you want.
+
+# Deployment
+
+Pushes to `master` are built and published to GitHub Pages automatically by
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). The workflow runs the same
+`npm run build` as above and serves the resulting single-file page as `index.html`.
+
+# Credits
+
+QubitBoard is a fork of [Quirk](https://github.com/Strilanc/Quirk), originally created by Craig Gidney at Google
+and released under the Apache License 2.0. This fork is independently maintained and is not affiliated with or
+endorsed by the original authors. See [LICENSE](LICENSE) for the full license text.
 
 # Disclaimer
 
-Quirk is not an official Google product.
+QubitBoard is not an official Google product.
