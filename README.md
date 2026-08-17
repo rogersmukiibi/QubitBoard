@@ -91,7 +91,3 @@ Pushes to `master` are built and published to GitHub Pages automatically by
 QubitBoard is a fork of [Quirk](https://github.com/Strilanc/Quirk), originally created by Craig Gidney at Google
 and released under the Apache License 2.0. This fork is independently maintained and is not affiliated with or
 endorsed by the original authors. See [LICENSE](LICENSE) for the full license text.
-
-# Disclaimer
-
-QubitBoard is not an official Google product.
