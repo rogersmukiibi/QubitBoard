@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-import {Suite} from "../TestUtil.js"
+import {Suite, assertThat} from "../TestUtil.js"
 import {ketArgs, ketShader, ketShaderPermute, ketShaderPhase} from "../../src/circuit/KetShaderUtil.js"
 import {assertThatCircuitShaderActsLikeMatrix} from "../CircuitOperationTestUtil.js"
+import {CircuitEvalContext} from "../../src/circuit/CircuitEvalContext.js"
+import {CircuitShaders} from "../../src/circuit/CircuitShaders.js"
 import {Complex} from "../../src/math/Complex.js"
+import {Controls} from "../../src/circuit/Controls.js"
+import {KetTextureUtil} from "../../src/circuit/KetTextureUtil.js"
 import {Matrix} from "../../src/math/Matrix.js"
+import {Shaders} from "../../src/webgl/Shaders.js"
 import {WglArg} from "../../src/webgl/WglArg.js"
+import {WglTextureTrader} from "../../src/webgl/WglTextureTrader.js"
 
 let suite = new Suite("KetShaderUtil");
 
@@ -56,4 +62,24 @@ suite.testUsingWebGL("ketShaderPhase", () => {
     assertThatCircuitShaderActsLikeMatrix(
         ctx => shader.withArgs(...ketArgs(ctx)),
         Matrix.generateDiagonal(8, i => Complex.polar(1, i/10)));
+});
+
+suite.testUsingWebGL("ketShaderPhase_preservesMagnitudes", () => {
+    let wireCount = 8;
+    let shader = ketShaderPhase('', 'return out_id*0.7;', wireCount);
+    let inVec = Matrix.generate(1, 1 << wireCount, r => new Complex(5 - (r % 7), (r % 5) - 2.5));
+    let trader = new WglTextureTrader(Shaders.vec2Data(inVec.rawBuffer()).toVec2Texture(wireCount));
+    let controlsTexture = CircuitShaders.controlMask(Controls.NONE).toBoolTexture(wireCount);
+    let ctx = new CircuitEvalContext(0, 0, wireCount, Controls.NONE, controlsTexture, Controls.NONE, trader, new Map());
+    ctx.applyOperation(shader.withArgs(...ketArgs(ctx)));
+    controlsTexture.deallocByDepositingInPool();
+    let out = KetTextureUtil.tradeTextureForVec2Output(trader);
+    let inp = inVec.rawBuffer();
+
+    let worst = 0;
+    for (let i = 0; i < out.length; i += 2) {
+        let ratio = Math.hypot(out[i], out[i + 1]) / Math.hypot(inp[i], inp[i + 1]);
+        worst = Math.max(worst, Math.abs(ratio - 1));
+    }
+    assertThat(worst).isLessThan(0.00001);
 });
