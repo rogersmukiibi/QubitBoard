@@ -25,7 +25,7 @@ shaders.
 | `html/` | Page template and partials, which are injected at build time by `GruntFile.js` |
 | `test/` | Unit tests; `test/**/*.test.js` mirrors `src/` |
 | `test_perf/` | Performance tests (`*.perf.js`) |
-| `doc/` | User guide, images, and this file |
+| `doc/` | User guide and images |
 
 ## Toolchain
 
@@ -45,7 +45,7 @@ npx grunt build-debug                # unminified build, easier to debug
 npx grunt build-test-page            # build out/test.html
 node PuppeteerRunTests.js            # run all unit tests in headless Chromium (what CI runs)
 node PuppeteerScreenshotCircuit.js   # render a sample circuit to screenshot.png
-npm run test-chrome                  # run unit tests through karma (needs a local Chrome)
+npm run test-chrome                  # run unit tests through karma (needs a local Chrome, or CHROME_BIN)
 npm run test-firefox                 # same, with Firefox
 ```
 
