@@ -26,7 +26,8 @@ shaders.
 | `html/` | Page template and partials, which are injected at build time by `GruntFile.js` |
 | `test/` | Unit tests; `test/**/*.test.{js,ts}` mirrors `src/` |
 | `test_perf/` | Performance tests (`*.perf.js`) |
-| `doc/` | User guide and images |
+| `doc/` | Quick reference (`doc/README.md`) and the guide's images |
+| `doc/wiki/` | Source of the GitHub wiki pages, including the user guide; published by `.github/workflows/wiki.yml` |
 
 ## Toolchain
 
@@ -77,6 +78,8 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 
 - `.github/workflows/ci.yml` builds, runs the Puppeteer test suite, and uploads a screenshot on every push and PR.
 - `.github/workflows/pages.yml` builds and deploys to GitHub Pages on pushes to `master`.
+- `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `master` that change it. Update the
+  guide in `doc/wiki/Qubit-Board-Guide.md` when a change affects how QubitBoard is used; never edit the wiki directly.
 
 ## Git
 

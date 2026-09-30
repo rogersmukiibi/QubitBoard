@@ -122,6 +122,11 @@ Pushes to `master` are also built and published to GitHub Pages by
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which runs the same build as `npm run build` and publishes
 `out/qubitboard.html` as the site's `index.html`.
 
+The [wiki](https://github.com/rogersmukiibi/QubitBoard/wiki) is published from this repository too. Its pages live in
+[`doc/wiki/`](doc/wiki), and [`.github/workflows/wiki.yml`](.github/workflows/wiki.yml) copies them to the wiki whenever
+a push to `master` changes them. Edit the guide in `doc/wiki/`, not on the wiki website: edits made there are
+overwritten by the next sync.
+
 # Credits
 
 QubitBoard is a fork of [Quirk](https://github.com/Strilanc/Quirk), originally created by Craig Gidney at Google

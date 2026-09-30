@@ -28,6 +28,9 @@ Open an issue at <https://github.com/rogersmukiibi/QubitBoard/issues>. For bugs,
 
     Under WSL or in a container, prefix the test command with `PUPPETEER_NO_SANDBOX=1`.
 6. Build the app with `npm run build` and try your change in `out/qubitboard.html`.
+7. If your change affects how QubitBoard is used, update the user guide in
+   [`doc/wiki/Qubit-Board-Guide.md`](doc/wiki/Qubit-Board-Guide.md). The wiki is published from that folder when your
+   change reaches `master`, so edit it there rather than on the wiki website.
 
 The project layout, coding conventions and more detailed build notes are in [AGENTS.md](AGENTS.md). They apply to
 human contributors as well as AI coding agents.
