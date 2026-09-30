@@ -29,6 +29,9 @@ QubitBoard assumes you already know background facts like "each wire represents 
 
 **[rogersmukiibi.com/QubitBoard](https://rogersmukiibi.com/QubitBoard/)**
 
+**Learn it**: the [Qubit Board Guide](https://github.com/rogersmukiibi/QubitBoard/wiki/Qubit-Board-Guide),
+the [tutorial video](https://youtu.be/hiMqqOVrBg0), and the [controls and conventions reference](doc/README.md).
+
 # Examples
 
 **Basic usage demo**:
@@ -47,13 +50,15 @@ QubitBoard assumes you already know background facts like "each wire represents 
 
 If you want to modify QubitBoard, this is how you get the code and turn your changes into working html/javascript.
 
-1. Have [git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/download/) installed.
+1. Have [git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/download/) 22.12 or newer installed.
 
-    `sudo add-apt-repository universe`
+    On Ubuntu 26.04 (including under WSL), the packaged Node.js is recent enough:
 
     `sudo apt-get update`
 
-    `sudo apt-get install --yes git npm nodejs build-essential`
+    `sudo apt-get install --yes git nodejs npm`
+
+    On older distributions, install Node.js 22 with [nvm](https://github.com/nvm-sh/nvm) or from [nodejs.org](https://nodejs.org/en/download/).
 
 2. Clone the repository.
 
@@ -63,28 +68,38 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 
     `cd QubitBoard`
 
-    `npm install`
+    `npm ci`
 
 4. (*Optional*) Make your changes. Run the tests.
 
-    `npm run test-firefox`
+    `npx grunt build-test-page && node PuppeteerRunTests.js`
+
+    This uses the Chromium that Puppeteer downloads during `npm ci`, so no browser needs to be installed.
+    Under WSL or in a container, prefix it with `PUPPETEER_NO_SANDBOX=1`.
+    To use a locally installed browser through karma instead, run `npm run test-chrome` or `npm run test-firefox`.
 
 5. Build the output.
 
     `npm run build`
 
+    For an unminified build that is easier to debug, run `npx grunt build-debug` instead.
+
 6. Confirm the output works by opening `out/qubitboard.html` with a web browser.
 
-    `firefox out/qubitboard.html`
+    On Linux: `xdg-open out/qubitboard.html`
 
-7. Copy `out/qubitboard.html` to wherever you want.
+    Under WSL, to open it in your default Windows browser: `explorer.exe "$(wslpath -w out/qubitboard.html)"`
+
+7. Copy `out/qubitboard.html` to wherever you want. It is a single self-contained file.
+
+Contributors and AI coding agents can find the project layout and conventions in [AGENTS.md](AGENTS.md).
 
 # Deployment
 
-Pushes to `master` are built and published to GitHub Pages automatically by
-[`.github/workflows/pages.yml`](.github/workflows/pages.yml). The workflow runs the same `npm run build` as above and publishes `out/qubitboard.html` as the site's `index.html`.
-
-
+Every push and pull request is tested by [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+Pushes to `master` are also built and published to GitHub Pages by
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml), which runs the same build as `npm run build` and publishes
+`out/qubitboard.html` as the site's `index.html`.
 
 # Credits
 

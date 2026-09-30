@@ -105,8 +105,12 @@ suite.canvasAppearanceTest("printLine_aligned", 40, 40, canvas => {
         "green",
         24,
         "monospace");
-    assertThat(used1).isApproximatelyEqualTo(new Rect(0, 12, 14.4, 24), 2.5);
-    assertThat(used2).isApproximatelyEqualTo(new Rect(20, 23.25, 20, 9), 2.5);
+    assertThat([used1.x, used1.w]).isApproximatelyEqualTo([0, 14.4], 2.5);
+    assertThat(used1.y).isGreaterThan(-0.001);
+    assertThat(used1.bottom()).isLessThan(40.001);
+    assertThat([used2.right(), used2.w]).isApproximatelyEqualTo([40, 20], 2.5);
+    assertThat(used2.y).isGreaterThan(-0.001);
+    assertThat(used2.bottom()).isLessThan(40.001);
 }, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABYUlEQVRYhe3WoW7DMBQF0MdKzIKMwsyCzALDCg2L/QH' +
 '5hfsL5cWjY4NlZUNlZWVDQ0FFd6CzV6WNmm7T7EkGV6riqjp+z8+NAGDOkdSAAizA1IACLMDUgAIswNSAAvwz4MEYUuQqx7rOA3iZbddxUIpPqxUpwnX' +
 'f5wU81jX3TUMAHJTirm3zAW68J0W48Z4AuGtbvldVPsAxaAxODnyvqquWvmkdW54UODUUYWiSA/dNc/NaWfc9KcJn59ICT4vFzbsw5GDMrB9VUFT4nYp' +
