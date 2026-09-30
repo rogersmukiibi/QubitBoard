@@ -40,6 +40,7 @@ import {initForge, obsForgeIsShowing} from "./ui/forge.js"
 import {initMenu, obsMenuIsShowing, closeMenu} from "./ui/menu.js"
 import {initUndoRedo} from "./ui/undo.js"
 import {initClear} from "./ui/clear.js"
+import {initCodePanel} from "./ui/codePanel.js"
 import {initUrlCircuitSync} from "./ui/url.js"
 import {initTitleSync} from "./ui/title.js"
 import {simulate} from "./ui/sim.js"
@@ -301,6 +302,7 @@ initUndoRedo(revision, obsIsAnyOverlayShowing.observable());
 initClear(revision, obsIsAnyOverlayShowing.observable());
 initMenu(revision, obsIsAnyOverlayShowing.observable());
 initTitleSync(revision);
+initCodePanel(revision, obsIsAnyOverlayShowing.observable());
 obsForgeIsShowing.
     zipLatest(obsExportsIsShowing, (e1, e2) => e1 || e2).
     zipLatest(obsMenuIsShowing, (e1, e2) => e1 || e2).

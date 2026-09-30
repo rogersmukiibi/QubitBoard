@@ -266,7 +266,7 @@ export class AssertionSubject {
 /**
  * Returns an assertion subject for the given value, which can be fluently extended with conditions like "isEqualTo".
  * @param {*} subject
- * @param {=undefined} extraArgCatcher
+ * @param {*=} extraArgCatcher
  * returns {!AssertionSubject}
  */
 export function assertThat(subject, extraArgCatcher) {
@@ -287,7 +287,7 @@ export function assertFalse(subject) {
 /**
  * Invokes a function, requiring it to throw an exception. Returns the exception wrapped in an assertion subject.
  * @param {function()} func
- * @param {=undefined} extraArgCatcher
+ * @param {*=} extraArgCatcher
  * returns {!AssertionSubject}
  */
 export function assertThrows(func, extraArgCatcher) {

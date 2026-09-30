@@ -70,7 +70,9 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 
     `npm ci`
 
-4. (*Optional*) Make your changes. Run the tests.
+4. (*Optional*) Make your changes. Type-check them, then run the tests.
+
+    `npm run typecheck`
 
     `npx grunt build-test-page && node PuppeteerRunTests.js`
 
@@ -93,6 +95,25 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 7. Copy `out/qubitboard.html` to wherever you want. It is a single self-contained file.
 
 Contributors and AI coding agents can find the project layout and conventions in [AGENTS.md](AGENTS.md).
+
+## TypeScript
+
+QubitBoard is moving from JavaScript to TypeScript one file at a time:
+
+- **Write new files in TypeScript** (`.ts`), in `src/` and in `test/` alike.
+- **Leave existing `.js` files as JavaScript** when you only change a few lines. Convert a file only as a deliberate
+  change of its own.
+- **Import with the `.js` extension**, even when the module is a `.ts` file:
+  `import {CodeError} from "../code/CodeError.js"`. That path works from both languages and doesn't have to change
+  when a file is converted.
+
+The build handles the mix. Every build task first runs `tsc` (configured by [`tsconfig.json`](tsconfig.json)), which
+type-checks the `.ts` files and compiles them to ES2015 JavaScript. That output then goes through the same traceur
+and uglify steps as the `.js` files. A type error stops the build, so `npm run typecheck` is a quick way to check
+your changes before running the tests.
+
+TypeScript reads the types of existing `.js` modules from their JSDoc comments. When a `.ts` file gets a wrong type
+from an old module, fixing that module's JSDoc is usually the smallest fix.
 
 # Deployment
 

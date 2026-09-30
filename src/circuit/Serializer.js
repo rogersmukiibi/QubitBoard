@@ -58,7 +58,7 @@ function initSerializer(gateLabelDrawer, gateMatrixDrawer, gateCircuitDrawer, lo
 class Serializer {
     /**
      * @param {*} value
-     * @param {*=undefined} context
+     * @param {*=} context
      * @returns {*}
      */
     static toJson(value, context=undefined) {
@@ -76,7 +76,7 @@ class Serializer {
     /**
      * @param {*} expectedType
      * @param {*} json
-     * @param {*=undefined} context
+     * @param {*=} context
      * @returns {*}
      */
     static fromJson(expectedType, json, context=undefined) {

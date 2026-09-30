@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "ES2015",
+        "moduleResolution": "bundler",
+        "lib": ["ES2017", "DOM"],
+        "strict": true,
+        "allowJs": true,
+        "checkJs": false,
+        "skipLibCheck": true,
+        "noEmitOnError": true,
+        "rootDir": ".",
+        "outDir": "out/tmp/tsc",
+        "newLine": "lf"
+    },
+    "include": ["src/**/*.ts", "test/**/*.ts"]
+}
