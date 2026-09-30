@@ -15,8 +15,20 @@
  */
 
 var path = require('path');
+var childProcess = require('child_process');
+
+// TypeScript files are compiled by tsc into out/tmp/tsc first. Traceur then picks up the compiled .js files from
+// there, next to the plain .js files from src/ and test/, so both kinds of module end up in the same bundle.
+var TS_OUT_DIR = 'out/tmp/tsc/';
 
 module.exports = function(grunt) {
+    // The compiled .js paths of the TypeScript files under a directory, e.g. 'ui/codePanel.js'.
+    var compiledTypeScriptFiles = function(dir) {
+        return grunt.file.expand({cwd: dir}, ['**/*.ts', '!**/*.d.ts']).map(function(e) {
+            return e.replace(/\.ts$/, '.js');
+        });
+    };
+
     //noinspection JSUnresolvedFunction
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -34,6 +46,11 @@ module.exports = function(grunt) {
                     cwd: 'src/',
                     src: ['**/*.js'],
                     dest: 'out/tmp/traceur/src/'
+                }, {
+                    expand: true,
+                    cwd: TS_OUT_DIR + 'src/',
+                    src: compiledTypeScriptFiles('src/'),
+                    dest: 'out/tmp/traceur/src/'
                 }]
             },
             'translate-test': {
@@ -47,6 +64,11 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: 'test/',
                     src: ['**/*.js'],
+                    dest: 'out/tmp/traceur/test/'
+                }, {
+                    expand: true,
+                    cwd: TS_OUT_DIR + 'test/',
+                    src: compiledTypeScriptFiles('test/'),
                     dest: 'out/tmp/traceur/test/'
                 }]
             },
@@ -157,11 +179,23 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('bootstrap-get-packages', function(src, dst) {
-        var packagedFiles = grunt.file.glob.sync(src);
+        // TypeScript modules are registered under their compiled .js name.
+        var packagedFiles = grunt.file.expand(src.split(',')).map(function(e) {
+            return e.replace(/\.ts$/, '.js');
+        });
         var getters = packagedFiles.map(function(e) {
             return '$traceurRuntime.getModule("' + e + '");';
         }).join('\n');
         grunt.file.write(dst, getters);
+    });
+
+    grunt.registerTask('compile-ts', 'Type-check and compile the TypeScript sources with tsc.', function() {
+        var tsc = path.join('node_modules', '.bin', process.platform === 'win32' ? 'tsc.cmd' : 'tsc');
+        try {
+            childProcess.execFileSync(tsc, ['-p', 'tsconfig.json', '--outDir', TS_OUT_DIR], {stdio: 'inherit'});
+        } catch (ex) {
+            grunt.fail.warn('TypeScript compilation failed.');
+        }
     });
 
     grunt.registerTask('inject-js-into-html', function(htmlSrc, jsSrc, dst) {
@@ -171,12 +205,17 @@ module.exports = function(grunt) {
         var forgePart = grunt.file.read('html/forge.partial.html');
         var exportPart = grunt.file.read('html/export.partial.html');
         var menuPart = grunt.file.read('html/menu.partial.html');
+        var codePart = grunt.file.read('html/code.partial.html');
+        // Shown in the page header as major.minor, e.g. "2.4" for package.json version "2.4.0".
+        var version = grunt.file.readJSON('package.json').version.split('.').slice(0, 2).join('.');
         var output = html;
+        output = output.split("<!-- INCLUDE VERSION -->").join(version);
         output = output.split("<!-- INCLUDE SOURCE PART -->").join(js);
         output = output.split("<!-- INCLUDE MENU PART -->").join(menuPart);
         output = output.split("<!-- INCLUDE ERROR PART -->").join(errPart);
         output = output.split("<!-- INCLUDE FORGE PART -->").join(forgePart);
         output = output.split("<!-- INCLUDE EXPORT PART -->").join(exportPart);
+        output = output.split("<!-- INCLUDE CODE PART -->").join(codePart);
         grunt.file.write(dst, output);
     });
 
@@ -189,6 +228,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build-src', [
         'clean:clean-tmp',
+        'compile-ts',
         'traceur:translate-src',
         'bootstrap-get-packages:src/main.js:out/tmp/traceur/bootstrap_post_src/run_main.js',
         'concat:concat-traceur-src',
@@ -198,6 +238,7 @@ module.exports = function(grunt) {
     ]);
     grunt.registerTask('build-debug', [
         'clean:clean-tmp',
+        'compile-ts',
         'traceur:translate-src',
         'bootstrap-get-packages:src/main.js:out/tmp/traceur/bootstrap_post_src/run_main.js',
         'concat:concat-traceur-src',
@@ -206,14 +247,16 @@ module.exports = function(grunt) {
     ]);
     grunt.registerTask('build-test', [
         'clean:clean-tmp',
+        'compile-ts',
         'traceur:translate-src',
         'traceur:translate-test',
-        'bootstrap-get-packages:test/**/*.test.js:out/tmp/traceur/bootstrap_post_test/run_tests.js',
+        'bootstrap-get-packages:test/**/*.test.js,test/**/*.test.ts:out/tmp/traceur/bootstrap_post_test/run_tests.js',
         'concat:concat-traceur-test',
         'clean:clean-tmp'
     ]);
     grunt.registerTask('build-test-perf', [
         'clean:clean-tmp',
+        'compile-ts',
         'traceur:translate-src',
         'traceur:translate-test-perf',
         'bootstrap-get-packages:test_perf/**/*.perf.js:out/tmp/traceur/bootstrap_post_test/run_tests.js',

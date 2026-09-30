@@ -1,0 +1,44 @@
+name: publish-wiki
+
+# The wiki's source lives in doc/wiki/, so guide changes are reviewed like code.
+# Each push to master that touches it mirrors doc/wiki/ into the GitHub wiki (a separate git repository).
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'doc/wiki/**'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+
+# Pushing to the wiki repository needs write access.
+permissions:
+  contents: write
+
+# Let a running publish finish rather than cancelling it half-pushed.
+concurrency:
+  group: wiki
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mirror doc/wiki into the wiki repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki
+          # --delete removes pages that no longer exist in doc/wiki, so the wiki matches the repo exactly.
+          rsync -a --delete --exclude .git doc/wiki/ wiki/
+          cd wiki
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'The wiki is already up to date.'
+            exit 0
+          fi
+          git commit -m "Sync wiki from ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}"
+          git push

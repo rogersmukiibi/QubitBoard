@@ -35,6 +35,11 @@ function initUndoRedo(revision, obsIsAnyOverlayShowing) {
     redoButton.addEventListener('click', () => revision.redo());
 
     document.addEventListener("keydown", e => {
+        // Let the code panel's editor keep its own text undo/redo.
+        if (e.target instanceof Element && e.target.closest('#code-panel') !== null) {
+            return;
+        }
+
         // Don't capture keystrokes while menus are showing.
         for (let div of overlay_divs) {
             if (div.style.display !== 'NONE' && div.style.display !== 'none') {

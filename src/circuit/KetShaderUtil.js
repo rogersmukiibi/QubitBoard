@@ -103,7 +103,7 @@ const ketShaderPhase = (head, body, span=null) => ketShader(
     `,
     `
         float angle = _ketgen_phase_for(out_id);
-        return cmul(amp, vec2(cos(angle), sin(angle)));
+        return cmul(amp, normalize(vec2(cos(angle), sin(angle))));
     `,
     span);
 
