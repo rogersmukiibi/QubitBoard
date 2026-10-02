@@ -79,8 +79,8 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 ## CI
 
 - `.github/workflows/ci.yml` builds, runs the Puppeteer test suite, and uploads a screenshot on every push and PR.
-- `.github/workflows/pages.yml` builds and deploys to GitHub Pages on pushes to `master`.
-- `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `master` that change it. Update the
+- `.github/workflows/pages.yml` builds and deploys to GitHub Pages on pushes to `main`.
+- `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `main` that change it. Update the
   guide in `doc/wiki/Qubit-Board-Guide.md` when a change affects how QubitBoard is used; never edit the wiki directly.
 
 ## Changelog and roadmap

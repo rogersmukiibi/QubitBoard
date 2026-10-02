@@ -30,7 +30,7 @@ Open an issue at <https://github.com/rogersmukiibi/QubitBoard/issues>. For bugs,
 6. Build the app with `npm run build` and try your change in `out/qubitboard.html`.
 7. If your change affects how QubitBoard is used, update the user guide in
    [`doc/wiki/Qubit-Board-Guide.md`](doc/wiki/Qubit-Board-Guide.md). The wiki is published from that folder when your
-   change reaches `master`, so edit it there rather than on the wiki website.
+   change reaches `main`, so edit it there rather than on the wiki website.
 8. Add an entry to the **Unreleased** section of [`CHANGELOG.md`](CHANGELOG.md). Planned work and known issues are
    tracked in [`ROADMAP.md`](ROADMAP.md).
 
@@ -47,7 +47,7 @@ human contributors as well as AI coding agents.
 
 ## Pull requests
 
-Open pull requests against the `master` branch of
+Open pull requests against the `main` branch of
 [rogersmukiibi/QubitBoard](https://github.com/rogersmukiibi/QubitBoard). Every pull request is built and tested by
 CI, and is reviewed by the maintainer before it's merged. Keep each pull request focused on one change, and describe
 what it changes and how you tested it.

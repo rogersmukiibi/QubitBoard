@@ -12,7 +12,7 @@ QubitBoard is a fork of [Quirk](https://github.com/Strilanc/Quirk).
 
 When you open QubitBoard with an empty circuit, the following overlay is shown:
 
-![QubitBoard main menu](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_menu.png)
+![QubitBoard main menu](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_menu.png)
 
 This is QubitBoard's main menu.
 It provides links to a tutorial video, the source code, and this manual.
@@ -24,7 +24,7 @@ You can dismiss this overlay by clicking "Edit Circuit", pressing the Escape key
 
 Almost all the time you spend in QubitBoard will be spent staring at the circuit editing area:
 
-![QubitBoard circuit editing area](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_circuit-editing-area.png)
+![QubitBoard circuit editing area](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_circuit-editing-area.png)
 
 Along the top and bottom are the toolboxes, which contain a variety of quantum gates.
 The middle area is showing the circuit.
@@ -85,7 +85,7 @@ Here are the basic available actions:
 
 The code panel at the bottom of the page shows the current circuit as code, and lets you build or edit a circuit by typing instead of dragging.
 
-![QubitBoard code panel](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_code-panel.png)
+![QubitBoard code panel](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_code-panel.png)
 
 The panel and the circuit stay in sync in both directions, but in different ways:
 
@@ -265,7 +265,7 @@ But QubitBoard is a simulator, so it doesn't have to play by those rules.
 
 For example, here is a circuit using (from left to right) Bloch sphere displays, an amplitude display, a chance display, and a density matrix display:
 
-![Displays](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_various-displays.png)
+![Displays](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_various-displays.png)
 
 A big part of using QubitBoard effectively amounts to putting the right kind of display in the right place.
 In fact, it's often beneficial to perform additional quantum gates purely to make the information shown in the displays more useful.
@@ -274,7 +274,7 @@ Here are the four important kinds of displays.
 
 - **Chance Display**
 
-    ![chance display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_chance-display.png)
+    ![chance display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_chance-display.png)
 
     This resizable display shows the probability of computational basis states.
     To be more concrete, if you were planning to measure the qubits covered by a chance display in the computation basis (the Z basis), then the chance display shows the probability of each possible measurement result.
@@ -285,7 +285,7 @@ Here are the four important kinds of displays.
 
 - **Bloch Sphere Display**
 
-    ![bloch sphere display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_bloch-display.png)
+    ![bloch sphere display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_bloch-display.png)
 
     This display shows the [Bloch vector representation](https://en.wikipedia.org/wiki/Bloch_sphere) of a single qubit's state.
     You can view the exact coordinates by hovering over the display, or just look at the pseudo-3d indicator to get a sense of where it is.
@@ -295,7 +295,7 @@ Here are the four important kinds of displays.
     The amplitude display is like the chance display, except it shows amplitudes instead of probabilities.
     It tells you the quantum amplitude of each computation basis state of the qubits covered by the display.
 
-    ![amplitude display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_amp-display.png)
+    ![amplitude display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_amp-display.png)
 
     Each square section in an amplitude display represents one of the amplitudes.
     The radius of the light blue circle is the amplitude's magnitude, and the angle of the black line indicator is the amplitude's phase.
@@ -314,7 +314,7 @@ Here are the four important kinds of displays.
 
     The density matrix display is like the amplitude display, except it shows the components of the density matrix of covered qubits instead of the components of the superposition.
 
-    ![density matrix display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_density-display.png)
+    ![density matrix display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_density-display.png)
 
     The advantage of the density matrix display over the amplitude display is that it works even if there is entanglement between the covered qubits and other qubits.
     The downside is that it contains significantly more information; it's harder to read.
@@ -330,11 +330,11 @@ For example, in the following circuit, we want a T state to be produced on the f
 If we just put an amplitude display on the first qubit, we aren't able to tell what's going on.
 But if we condition on the other two qubits being off, we can see the state we care about.
 
-![control displays example](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_controlled-display.png)
+![control displays example](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_controlled-display.png)
 
 We can also use controlled displays to get insight into entangled states, by seeing how one qubit's state depends on another along various axes:
 
-![epr conditioning](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_controlled-epr-display.png)
+![epr conditioning](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_controlled-epr-display.png)
 
 # Measurement and Detectors
 
@@ -346,7 +346,7 @@ The answer to this question depends on whether or not you condition on the measu
 If you don't condition on the measurement result, the state of the qubit is described by a 2x2 maximally mixed density matrix.
 If you do condition on the result, then half of the time the post-measurement state will be |0⟩ and the other half of the time it will be |1⟩.
 
-![measurement types](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_measurement-types.png)
+![measurement types](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_measurement-types.png)
 
 When you are attempting to explore all the possible outcomes in a structured way, the first type of measurement is more useful.
 The simulation will explore all of the measurement results, and then you can use controlled displays to look at the individual cases at your leisure.
@@ -381,7 +381,7 @@ A happy coincidence of this layout is that, when applying an operation to one ha
 
 For example, note how the output display of this circuit is showing the matrix of a Fourier transform:
 
-![qft matrix](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_state-channel-duality.png)
+![qft matrix](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_state-channel-duality.png)
 
 ## URL Circuit Editing
 
