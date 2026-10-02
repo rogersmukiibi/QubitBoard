@@ -31,6 +31,8 @@ Open an issue at <https://github.com/rogersmukiibi/QubitBoard/issues>. For bugs,
 7. If your change affects how QubitBoard is used, update the user guide in
    [`doc/wiki/Qubit-Board-Guide.md`](doc/wiki/Qubit-Board-Guide.md). The wiki is published from that folder when your
    change reaches `master`, so edit it there rather than on the wiki website.
+8. Add an entry to the **Unreleased** section of [`CHANGELOG.md`](CHANGELOG.md). Planned work and known issues are
+   tracked in [`ROADMAP.md`](ROADMAP.md).
 
 The project layout, coding conventions and more detailed build notes are in [AGENTS.md](AGENTS.md). They apply to
 human contributors as well as AI coding agents.

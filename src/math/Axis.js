@@ -164,7 +164,8 @@ PARSE_AXIS_TOKEN_MAP.set("sqrt", {
     priority: 4});
 PARSE_AXIS_TOKEN_MAP.set("^", {
     binary_action: Axis.raisedTo,
-    priority: 3});
+    priority: 3,
+    right_associative: true});
 PARSE_AXIS_TOKEN_MAP.set("*", {
     binary_action: Axis.times,
     priority: 2});
@@ -174,11 +175,13 @@ PARSE_AXIS_TOKEN_MAP.set("/", {
 PARSE_AXIS_TOKEN_MAP.set("-", {
     unary_action: Axis.negate,
     binary_action: Axis.subtract,
-    priority: 1});
+    priority: 1,
+    unary_priority: 2.5});
 PARSE_AXIS_TOKEN_MAP.set("+", {
     unary_action: e => e,
     binary_action: Axis.add,
-    priority: 1});
+    priority: 1,
+    unary_priority: 2.5});
 PARSE_AXIS_TOKEN_MAP.set("√", PARSE_AXIS_TOKEN_MAP.get("sqrt"));
 
 export {Axis}

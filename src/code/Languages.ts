@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import {Cirq} from "./languages/Cirq.js"
 import {OpenQasm3} from "./languages/OpenQasm3.js"
 import {QubitBoardDsl} from "./languages/QubitBoardDsl.js"
 
@@ -33,11 +34,12 @@ interface CodeLanguage {
 }
 
 /**
- * The languages offered by the code panel. To add a language, implement CodeLanguage and list it here.
+ * The languages offered by the code panel, default first. To add a language, implement CodeLanguage and list it here.
  */
 const CODE_LANGUAGES: CodeLanguage[] = [
-    QubitBoardDsl,
-    OpenQasm3
+    Cirq,
+    OpenQasm3,
+    QubitBoardDsl
 ];
 
 /**

@@ -28,6 +28,8 @@ shaders.
 | `test_perf/` | Performance tests (`*.perf.js`) |
 | `doc/` | Quick reference (`doc/README.md`) and the guide's images |
 | `doc/wiki/` | Source of the GitHub wiki pages, including the user guide; published by `.github/workflows/wiki.yml` |
+| `CHANGELOG.md` | What changed in each version |
+| `ROADMAP.md` | Planned work, known issues and past design decisions |
 
 ## Toolchain
 
@@ -80,6 +82,15 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 - `.github/workflows/pages.yml` builds and deploys to GitHub Pages on pushes to `master`.
 - `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `master` that change it. Update the
   guide in `doc/wiki/Qubit-Board-Guide.md` when a change affects how QubitBoard is used; never edit the wiki directly.
+
+## Changelog and roadmap
+
+- When a change alters behavior, add an entry to the **Unreleased** section of `CHANGELOG.md` in the same change. Mark
+  it **(breaking)** if existing circuit links behave differently.
+- When work listed in `ROADMAP.md` is done, remove it there. When you defer something or find a limitation, add it
+  there.
+- Don't change `"version"` in `package.json` unless asked: the maintainer decides when to release. The minor number
+  is for a new major feature area (2.4 added the code editor); changes inside one are patch releases.
 
 ## Git
 
