@@ -74,7 +74,7 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 
     `npm run typecheck`
 
-    `npx grunt build-test-page && node PuppeteerRunTests.js`
+    `npm test`
 
     This uses the Chromium that Puppeteer downloads during `npm ci`, so no browser needs to be installed.
     Under WSL or in a container, prefix it with `PUPPETEER_NO_SANDBOX=1`.
@@ -84,7 +84,7 @@ If you want to modify QubitBoard, this is how you get the code and turn your cha
 
     `npm run build`
 
-    For an unminified build that is easier to debug, run `npx grunt build-debug` instead.
+    For an unminified build with a source map, which is easier to debug, run `npm run build-debug` instead.
 
 6. Confirm the output works by opening `out/qubitboard.html` with a web browser.
 
@@ -107,10 +107,10 @@ QubitBoard is moving from JavaScript to TypeScript one file at a time:
   `import {CodeError} from "../code/CodeError.js"`. That path works from both languages and doesn't have to change
   when a file is converted.
 
-The build handles the mix. Every build task first runs `tsc` (configured by [`tsconfig.json`](tsconfig.json)), which
-type-checks the `.ts` files and compiles them to ES2015 JavaScript. That output then goes through the same traceur
-and uglify steps as the `.js` files. A type error stops the build, so `npm run typecheck` is a quick way to check
-your changes before running the tests.
+The build handles the mix. [esbuild](https://esbuild.github.io/) bundles the `.js` and `.ts` files together, and strips
+the types without checking them. So every build first runs `tsc` (configured by [`tsconfig.json`](tsconfig.json)) to
+type-check the `.ts` files. A type error stops the build, so `npm run typecheck` is a quick way to check your changes
+before running the tests.
 
 TypeScript reads the types of existing `.js` modules from their JSDoc comments. When a `.ts` file gets a wrong type
 from an old module, fixing that module's JSDoc is usually the smallest fix.

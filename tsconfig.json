@@ -8,10 +8,8 @@
         "allowJs": true,
         "checkJs": false,
         "skipLibCheck": true,
-        "noEmitOnError": true,
-        "rootDir": ".",
-        "outDir": "out/tmp/tsc",
-        "newLine": "lf"
+        "isolatedModules": true,
+        "noEmit": true
     },
-    "include": ["src/**/*.ts", "test/**/*.ts"]
+    "include": ["src/**/*.ts", "test/**/*.ts", "test_perf/**/*.ts"]
 }

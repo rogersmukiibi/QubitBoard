@@ -33,7 +33,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx grunt build-src
+      - run: npm run build
 
       - name: Assemble site
         run: |

@@ -36,6 +36,14 @@ Each of these gates currently stays on a `# @qb` comment line. They are listed i
 
 - Retake `doc/MANUAL_code-panel.png`: it shows the QubitBoard language as the default.
 
+### Tooling
+
+- **Replace or remove karma.** It is deprecated, and its dependencies (`braces`, through `chokidar`) are the three
+  findings `npm audit` still reports. Only `npm run test-chrome`, `test-firefox` and `test-perf-chrome` use it. CI runs
+  the tests with Puppeteer, and `out/test.html` can be opened in any browser.
+- **Source map for the production build.** Only debug and test builds have one, inline. The deployed page would need
+  it as a separate file published next to `index.html`.
+
 ## Known issues
 
 - `sqrt` of a negated real number picks the lower branch: the formula `sqrt -4` gives -2i, not 2i. Negating a real

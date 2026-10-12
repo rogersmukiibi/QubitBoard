@@ -23,7 +23,7 @@ Open an issue at <https://github.com/rogersmukiibi/QubitBoard/issues>. For bugs,
 
     ```bash
     npm run typecheck
-    npx grunt build-test-page && node PuppeteerRunTests.js
+    npm test
     ```
 
     Under WSL or in a container, prefix the test command with `PUPPETEER_NO_SANDBOX=1`.

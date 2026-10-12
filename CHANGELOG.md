@@ -6,14 +6,26 @@ Add an entry under **Unreleased** in the same change that alters behavior. When 
 new version and date, set `"version"` in `package.json` and `package-lock.json`, and start a new empty **Unreleased**
 section.
 
-Version numbers: the minor number changes when a major feature area is added (2.4 added the code editor). Changes
-inside an existing feature area, such as a new code language or a different default, are patch releases. The page
-header shows only `major.minor`, so 2.4.0 and 2.4.1 both show "2.4".
+Version numbers: the minor number changes when a major feature area is added (2.4 added the code editor) or when the
+supported browsers change (2.5). Changes inside an existing feature area, such as a new code language or a different
+default, are patch releases. The page header shows only `major.minor`, so 2.4.0 and 2.4.1 both show "2.4".
 
 Entries are grouped as **Added**, **Changed**, **Fixed** and **Removed**. Anything that makes an existing circuit link
 behave differently is marked **(breaking)**.
 
 ## Unreleased
+
+## 2.5.0 (2026-10-12)
+
+### Changed
+
+- **The build uses esbuild** instead of traceur, grunt and uglify. The `npx grunt ...` commands are now npm scripts:
+  `npm run build`, `npm run build-debug`, `npm run build-test-page` and `npm test`, which builds the test page and runs
+  it. A build takes under a second instead of about seven, debug and test builds have source maps, and the page is
+  424 kB instead of 672 kB.
+- The page is ES2015 code instead of ES5, so it no longer runs in browsers without ES2015 support, such as Internet
+  Explorer 11.
+- The `lodash` and `semver` overrides are gone from `package.json`, along with the packages that needed them.
 
 ### Fixed
 

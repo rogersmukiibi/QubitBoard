@@ -3,38 +3,29 @@
   "title": "QubitBoard",
   "description": "A drag-and-drop toy for exploring and understanding small quantum circuits.",
   "license": "Apache-2.0",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "homepage": "https://rogersmukiibi.com/QubitBoard/",
   "bugs": {
     "url": "https://github.com/rogersmukiibi/QubitBoard/issues"
   },
   "devDependencies": {
-    "grunt": "~1.6.3",
-    "grunt-cli": "~1.5.0",
-    "grunt-contrib-clean": "~2.0.1",
-    "grunt-contrib-concat": "~2.1.0",
-    "grunt-contrib-copy": "~1.0.0",
-    "grunt-contrib-uglify": "~5.2.2",
-    "grunt-karma": "~4.0.2",
-    "grunt-traceur": "~0.5.5",
+    "esbuild": "~0.28.2",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",
     "karma-firefox-launcher": "~2.1.3",
     "puppeteer": "^25.12.0",
-    "traceur": "0.0.111",
     "typescript": "~7.0.2"
   },
-  "overrides": {
-    "lodash": "^4.18.1",
-    "semver": "^7.8.5"
-  },
   "scripts": {
-    "build": "grunt build-src",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "grunt test",
-    "test-chrome": "grunt test-chrome",
-    "test-firefox": "grunt test-firefox",
-    "test-travis": "grunt test-travis"
+    "build": "node build.mjs app",
+    "build-debug": "node build.mjs app-debug",
+    "build-test-page": "node build.mjs test",
+    "build-test-perf-page": "node build.mjs test-perf",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node build.mjs test && node PuppeteerRunTests.js",
+    "test-chrome": "node build.mjs test && karma start karma.test.conf.js --browsers Chrome",
+    "test-firefox": "node build.mjs test && karma start karma.test.conf.js --browsers Firefox",
+    "test-perf-chrome": "node build.mjs test-perf && karma start karma.test_perf.conf.js --browsers Chrome"
   },
   "repository": {
     "type": "git",
