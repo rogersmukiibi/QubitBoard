@@ -15,7 +15,11 @@ behave differently is marked **(breaking)**.
 
 ## Unreleased
 
-Nothing yet.
+### Fixed
+
+- Running unedited code no longer moves gates. When a wide gate (such as an amplitude display or a formula gate)
+  covered an otherwise empty column, the code left that column out, so pressing Run shifted the following gates left
+  into it. The empty column is now written as a `skip` line (`# @qb skip` in Cirq, `// @qb skip` in OpenQASM).
 
 ## 2.4.1 (2026-10-03)
 

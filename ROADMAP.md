@@ -29,8 +29,6 @@ Each of these gates currently stays on a `# @qb` comment line. They are listed i
 
 ### Other languages
 
-- **Qiskit**, mainly for export. It is the most widely used framework, but a poor match for the gate set (fractional
-  powers become opaque unitaries, and there are no columns).
 - **OpenQASM 3: `pow @`, `gphase`, `U` and gate definitions.** The reader rejects them today. Supporting them would let
   fractional powers be written as QASM.
 
@@ -56,5 +54,7 @@ QubitBoard language is kept.
   (`cirq.Moment`). CUDA-Q has no fractional powers, QFT or arithmetic, and was not pursued.
 - **2026-10-03: Formulas use standard (Python) precedence** instead of translating around the difference. See the
   changelog for what this changes in old links.
+- **2026-10-12: Qiskit is not planned for now.** It is the most widely used framework, but a poor match for the gate
+  set: fractional powers become opaque unitaries, and there are no columns.
 - **Exactness over coverage.** A gate is written in an external language only when the matrices are identical,
   including global phase, and the line reads back as the same column. Otherwise it stays a `@qb` comment.

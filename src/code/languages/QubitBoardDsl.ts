@@ -39,6 +39,9 @@ import {
 import type {ColumnEntry, GateJsonObject} from "../CircuitCode.js"
 import type {CodeLanguage} from "../Languages.js"
 
+/** A line holding an empty column, which only survives when a wide gate to its left covers it. */
+const EMPTY_COLUMN = 'skip';
+
 function formatWire(wire: number, bracketWires: boolean): string {
     return bracketWires ? `q[${wire}]` : `q${wire}`;
 }
@@ -47,6 +50,9 @@ function formatWire(wire: number, bracketWires: boolean): string {
  * @param bracketWires Write qubits as "q[0]" (for OpenQASM comments) instead of "q0".
  */
 function formatColumn(entries: ColumnEntry[], bracketWires: boolean = false): string {
+    if (entries.length === 0) {
+        return EMPTY_COLUMN;
+    }
     return entries.map(e => {
         let w = formatWire(e.wire, bracketWires);
         if (e.raw !== undefined) {
@@ -151,6 +157,9 @@ function parseDslLine(text: string, line: number, builder: CircuitJsonBuilder): 
     }
 
     builder.startColumn();
+    if (text === EMPTY_COLUMN) {
+        return;
+    }
     for (let item of splitTopLevel(text, ',')) {
         item = item.trim();
         if (item === '') {
@@ -204,7 +213,7 @@ const QubitBoardDsl: CodeLanguage = {
 
     highlightRules: [
         ['#.*', 'cm'],
-        ['^\\s*(?:qubits|init|gate)\\b', 'kw'],
+        ['^\\s*(?:qubits|init|gate|skip)\\b', 'kw'],
         ['\\b(?:ctrl|negctrl|xctrl|xnegctrl|yctrl|ynegctrl)\\b', 'ctl'],
         ['\\bq(?:\\d+|\\[\\d+\\])', 'wire'],
         ['\\[[^\\]]*\\]', 'arg'],

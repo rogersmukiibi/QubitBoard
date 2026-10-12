@@ -200,6 +200,7 @@ Chance3 q0          # a chance display over q0..q2
 
 - Gates that take a value have it in square brackets: formulas for formula gates, such as `Rxft[pi t^2]`, and numbers for the input-setting gates, such as `setA[5]`.
 - A custom gate is defined on a `gate` line holding its JSON before it's used, e.g. `gate ~inv = {"id":"~inv","name":"Inv","matrix":"{{0,1},{1,0}}"}` followed by `~inv q0`. These lines appear automatically for custom gates made with **Make Gate**.
+- A line holding just `skip` is an empty column. It only appears, and only has an effect, under a wide gate such as an amplitude display or a formula gate, where it keeps the next gates from moving left into the space beside it. Anywhere else an empty column is removed.
 - Two gates on one line can't overlap. For example, `QFT3 q0, H q1` is an error, because QFT3 on q0 already covers q1.
 - Circuits typed in code are tidied up the same way as dragged ones. For example, a gate typed right after a wide gate (such as a formula gate) moves over to make room, exactly as it would if you dropped it there.
 

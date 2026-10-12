@@ -222,7 +222,7 @@ class CircuitModel {
     init: Array<{wire: number, state: string}> = [];
     /** Custom gate definitions, as JSON. */
     customGates: GateJsonObject[];
-    /** Each non-empty column's gates, top wire first. */
+    /** Each column's gates, top wire first. A column can be empty when a wide gate to its left covers it. */
     columns: ColumnEntry[][] = [];
 
     /**
@@ -256,9 +256,7 @@ class CircuitModel {
                     entries.push({wire, id: String(e.id), arg, raw: isPlain ? undefined : e});
                 }
             }
-            if (entries.length > 0) {
-                this.columns.push(entries);
-            }
+            this.columns.push(entries);
         }
     }
 }
@@ -484,10 +482,8 @@ class CircuitJsonBuilder {
     toJson(): CircuitJson {
         let result: CircuitJson = {cols: []};
         for (let col of this.columns) {
-            if (col.size === 0) {
-                continue;
-            }
-            let arr = new Array<GateJson | 1>(Math.max(...col.keys()) + 1).fill(1);
+            // Empty columns are kept: tidying removes them unless a wide gate covers them.
+            let arr = new Array<GateJson | 1>(col.size === 0 ? 0 : Math.max(...col.keys()) + 1).fill(1);
             for (let [wire, {json}] of col.entries()) {
                 arr[wire] = json;
             }
