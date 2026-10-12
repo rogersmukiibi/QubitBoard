@@ -260,7 +260,7 @@ class Matrix {
 
     /**
      * Converts the given square block of coefficients into a square complex matrix.
-     * @param {!number|!Complex} coefs The coefficients of the matrix,
+     * @param {...(!number|!Complex)} coefs The coefficients of the matrix,
      * arranged in a flat array of square length with the coefficients (which can be numeric or complex) in row order.
      * @returns {!Matrix}
      */

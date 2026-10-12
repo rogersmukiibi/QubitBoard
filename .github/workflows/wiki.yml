@@ -1,10 +1,10 @@
 name: publish-wiki
 
 # The wiki's source lives in doc/wiki/, so guide changes are reviewed like code.
-# Each push to master that touches it mirrors doc/wiki/ into the GitHub wiki (a separate git repository).
+# Each push to main that touches it mirrors doc/wiki/ into the GitHub wiki (a separate git repository).
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - 'doc/wiki/**'
       - '.github/workflows/wiki.yml'

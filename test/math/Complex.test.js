@@ -175,6 +175,35 @@ suite.test("parse_raw", () => {
     assertThat(Complex.parse("2.5e+10")).isEqualTo(new Complex(25000000000, 0));
 });
 
+suite.test("parse_signAndPowerPrecedence", () => {
+    // A sign binds looser than a power, as in standard notation and in Python.
+    assertThat(Complex.parse("-2^2")).isEqualTo(-4);
+    assertThat(Complex.parse("(-2)^2")).isEqualTo(4);
+    assertThat(Complex.parse("--2^2")).isEqualTo(4);
+    assertThat(Complex.parse("3-2^2")).isEqualTo(-1);
+    assertThat(Complex.parse("-2^2/4")).isEqualTo(-1);
+    assertThat(Complex.parse("-2*3")).isEqualTo(-6);
+    assertThat(Complex.parse("-√4")).isEqualTo(-2);
+
+    // A sign can follow an operator.
+    assertThat(Complex.parse("2^-1")).isEqualTo(0.5);
+    assertThat(Complex.parse("-2^-2")).isEqualTo(-0.25);
+    assertThat(Complex.parse("3*2^-1")).isEqualTo(1.5);
+    assertThat(Complex.parse("1+2*-3")).isEqualTo(-5);
+    assertThat(Complex.parse("1+6/-3")).isEqualTo(-1);
+    assertThat(Complex.parse("2^-1*8")).isEqualTo(4);
+    assertThat(Complex.parse("5 - -3")).isEqualTo(8);
+
+    // Powers group from the right.
+    assertThat(Complex.parse("2^3^2")).isApproximatelyEqualTo(512);
+    assertThat(Complex.parse("(2^3)^2")).isApproximatelyEqualTo(64);
+    assertThat(Complex.parse("2^-3^2")).isApproximatelyEqualTo(Math.pow(2, -9));
+
+    // Functions without parentheses still apply to just the next value.
+    assertThat(Complex.parse("√4^2")).isApproximatelyEqualTo(4);
+    assertThat(Complex.parse("sqrt --4 + 1")).isApproximatelyEqualTo(3);
+});
+
 suite.test("parse_expressions", () => {
     assertThat(Complex.parse("1/3")).isEqualTo(1/3);
     assertThat(Complex.parse("2/3/5")).isEqualTo((2/3)/5);

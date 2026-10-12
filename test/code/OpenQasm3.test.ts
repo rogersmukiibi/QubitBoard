@@ -17,6 +17,7 @@
 import {Suite, assertThat, assertThrows} from "../TestUtil.js"
 import {CodeError} from "../../src/code/CodeError.js"
 import {OpenQasm3, formulaToQasm} from "../../src/code/languages/OpenQasm3.js"
+import {evalConstantFormula} from "../../src/code/CircuitCode.js"
 import {EXAMPLE_CIRCUITS, assertCodeRoundTrip, assertEveryGateRoundTrips} from "./CodeTestUtil.js"
 
 let suite = new Suite("OpenQasm3");
@@ -74,6 +75,14 @@ suite.test("emit_usesPragmasForQubitBoardOnlyGates", () => {
             "// @qb Y^1/2 q[0]",
             "// @qb xctrl q[0], X q[1]"
         ]);
+});
+
+suite.test("formulasMeanTheSameInQasm", () => {
+    // QASM follows the usual rules: a sign binds looser than a power, and powers group from the right.
+    assertThat(OpenQasm3.parse("rx(-pi**2/3) q[0];")).isEqualTo('{"cols":[[{"id":"Rxft","arg":"-pi^2/3"}]]}');
+    assertThat(evalConstantFormula("-pi^2/3")).isApproximatelyEqualTo(-Math.PI * Math.PI / 3);
+    assertThat(evalConstantFormula("2^3^2")).isApproximatelyEqualTo(512);
+    assertThat(evalConstantFormula("3*2^-1")).isApproximatelyEqualTo(1.5);
 });
 
 suite.test("formulaToQasm", () => {

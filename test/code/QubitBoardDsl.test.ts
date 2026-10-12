@@ -86,6 +86,17 @@ suite.test("parse", () => {
         '{"cols":[[1,"~a"]],"gates":[{"id":"~a","matrix":"{{0,1},{1,0}}"}]}');
 });
 
+suite.test("emptyColumn", () => {
+    let json = '{"cols":[["Amps2"],[],[1,1,1,"H"]]}';
+    let body = QubitBoardDsl.emit(json).split('\n').filter(e => e !== '' && !e.startsWith('#'));
+    assertThat(body).isEqualTo(["qubits 4", "Amps2 q0", "skip", "H q3"]);
+    assertThat(QubitBoardDsl.parse("Amps2 q0\nskip\nH q3")).isEqualTo(json);
+    // Without the skip line, H goes in the column beside the wide display.
+    assertThat(QubitBoardDsl.parse("Amps2 q0\nH q3")).isEqualTo('{"cols":[["Amps2"],[1,1,1,"H"]]}');
+    // An empty column that nothing covers is removed, like after a drop.
+    assertThat(QubitBoardDsl.parse("H q0\nskip\nskip\nX q0\nskip")).isEqualTo('{"cols":[["H"],["X"]]}');
+});
+
 suite.test("parse_matchesDragAndDropLayout", () => {
     // A gate typed onto a wide gate's second column gets pushed right, exactly like dropping it there would.
     let typed = QubitBoardDsl.parse("Rzft[pi/2] q0\nH q0");

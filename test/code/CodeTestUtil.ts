@@ -26,7 +26,9 @@ const EXAMPLE_CIRCUITS: {[name: string]: object} = {
     shor: {"cols":[[1,1,1,1,1,1,1,1,1,1,"~input",1,1,1,"~guess"],[1,1,1,1,1,1,1,1,1,1,{"id":"setR","arg":55},1,1,1,{"id":"setB","arg":26}],[],["H","H","H","H","H","H","H","H","H","H","X"],["inputA10",1,1,1,1,1,1,1,1,1,"*BToAmodR6"],["QFT†10"],[1,1,1,1,"~out"],["Chance10"]],"gates":[{"id":"~guess","name":"guess:","matrix":"{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}"},{"id":"~input","name":"input:","matrix":"{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}"},{"id":"~out","name":"out:","matrix":"{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}"}]},
     postselect: {"cols":[["H","H","H","H"],["Chance4"],["Amps1","|0⟩⟨0|","|+⟩⟨+|","|X⟩⟨X|"]],"init":[0,"+",1,"-i"]},
     formulas: {"cols":[[{"id":"Rxft","arg":"pi/2"}],["•",{"id":"Ryft","arg":"-pi^2/3"}],[{"id":"Z^ft","arg":"1/3"}],["◦","•",{"id":"Rzft","arg":"2 pi"}],[{"id":"X^ft","arg":"sin(pi t)"}]]},
-    swaps: {"cols":[["Swap","Swap"],["•","Swap","Swap"],["◦","Swap",1,"Swap"]]}
+    swaps: {"cols":[["Swap","Swap"],["•","Swap","Swap"],["◦","Swap",1,"Swap"]]},
+    // The empty column is kept because the two-column-wide display covers it.
+    emptyColumnUnderWideGate: {"cols":[["Amps2"],[],[1,1,1,"H"]]}
 };
 
 /**

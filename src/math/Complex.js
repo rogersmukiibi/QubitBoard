@@ -428,7 +428,8 @@ PARSE_COMPLEX_TOKEN_MAP_ALL.set("ln", {
     priority: 4});
 PARSE_COMPLEX_TOKEN_MAP_ALL.set("^", {
     binary_action: (a, b) => Complex.from(a).raisedTo(b),
-    priority: 3});
+    priority: 3,
+    right_associative: true});
 PARSE_COMPLEX_TOKEN_MAP_ALL.set("*", {
     binary_action: (a, b) => Complex.from(a).times(b),
     priority: 2});
@@ -438,11 +439,13 @@ PARSE_COMPLEX_TOKEN_MAP_ALL.set("/", {
 PARSE_COMPLEX_TOKEN_MAP_ALL.set("-", {
     unary_action: e => Complex.from(e).neg(),
     binary_action: (a, b) => Complex.from(a).minus(b),
-    priority: 1});
+    priority: 1,
+    unary_priority: 2.5});
 PARSE_COMPLEX_TOKEN_MAP_ALL.set("+", {
     unary_action: e => e,
     binary_action: (a, b) => Complex.from(a).plus(b),
-    priority: 1});
+    priority: 1,
+    unary_priority: 2.5});
 PARSE_COMPLEX_TOKEN_MAP_ALL.set("√", PARSE_COMPLEX_TOKEN_MAP_ALL.get("sqrt"));
 
 PARSE_COMPLEX_TOKEN_MAP_DEG.set("cos", {

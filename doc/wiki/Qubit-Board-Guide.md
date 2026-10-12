@@ -12,7 +12,7 @@ QubitBoard is a fork of [Quirk](https://github.com/Strilanc/Quirk).
 
 When you open QubitBoard with an empty circuit, the following overlay is shown:
 
-![QubitBoard main menu](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_menu.png)
+![QubitBoard main menu](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_menu.png)
 
 This is QubitBoard's main menu.
 It provides links to a tutorial video, the source code, and this manual.
@@ -24,7 +24,7 @@ You can dismiss this overlay by clicking "Edit Circuit", pressing the Escape key
 
 Almost all the time you spend in QubitBoard will be spent staring at the circuit editing area:
 
-![QubitBoard circuit editing area](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_circuit-editing-area.png)
+![QubitBoard circuit editing area](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_circuit-editing-area.png)
 
 Along the top and bottom are the toolboxes, which contain a variety of quantum gates.
 The middle area is showing the circuit.
@@ -85,7 +85,7 @@ Here are the basic available actions:
 
 The code panel at the bottom of the page shows the current circuit as code, and lets you build or edit a circuit by typing instead of dragging.
 
-![QubitBoard code panel](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_code-panel.png)
+![QubitBoard code panel](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_code-panel.png)
 
 The panel and the circuit stay in sync in both directions, but in different ways:
 
@@ -100,14 +100,76 @@ The panel and the circuit stay in sync in both directions, but in different ways
 
 A few more details:
 
-- Choose the language from the drop-down next to the **Code** button. The code is rewritten in the new language right away.
+- Choose the language from the drop-down next to the **Code** button: **Cirq** (the default), **OpenQASM 3** or **QubitBoard**. The code is rewritten in the new language right away.
 - While you're typing in the panel, Ctrl+Z and Ctrl+Y undo and redo your typing, not the circuit.
 - **Copy** copies the code. **▾ Code** collapses the panel to a thin bar, and you can drag the panel's top edge to resize it.
 - Tab indents. Press Escape to move focus out of the editor.
 
+## Cirq
+
+[Cirq](https://quantumai.google/cirq) is Google's Python library for quantum circuits, and it is the default language of the code panel.
+The code is ordinary Cirq: copy it into a Python file or notebook and it runs as it is.
+You can also paste Cirq code into the panel and run it.
+
+Each line of the circuit is one column:
+
+```python
+import cirq
+import sympy
+
+# One line per column. "# @qb" lines hold QubitBoard-only gates; Cirq ignores them.
+t = sympy.Symbol('t')  # QubitBoard's time, which runs from -1 to 1
+q = cirq.LineQubit.range(3)
+
+circuit = cirq.Circuit([
+    cirq.Moment(cirq.H(q[0]), cirq.X(q[2])**0.25),
+    cirq.Moment(cirq.X(q[1]).controlled_by(q[0])),
+    [cirq.X(q[1]).controlled_by(q[0]), cirq.Z(q[2]).controlled_by(q[0])],
+    cirq.Moment(cirq.rz(sympy.pi * t**2)(q[2])),
+    # @qb Chance3 q[0]
+])
+```
+
+- `q[0]` is the top wire.
+- A column is a `cirq.Moment`. The exception is a column where several gates share the same controls: Cirq doesn't allow a control qubit to be used twice in one moment, so that column is written as a bracketed list of operations, as in the third line above.
+- QubitBoard only uses a Cirq gate when it matches QubitBoard's gate *exactly*, including global phase (see [Conventions](#conventions)):
+
+    | QubitBoard | Cirq |
+    |------------|------|
+    | H, X, Y, Z, Swap, Measure | `cirq.H`, `cirq.X`, `cirq.Y`, `cirq.Z`, `cirq.SWAP`, `cirq.measure` |
+    | Z^½, Z^-½, Z^¼, Z^-¼ (S, S⁻¹, T, T⁻¹) | `cirq.S`, `cirq.S**-1`, `cirq.T`, `cirq.T**-1` |
+    | Other fixed powers, such as X^½, Y^-¼, Z^⅓ | `cirq.X(q)**0.5`, `cirq.Y(q)**-0.25`, `cirq.Z(q)**(1/3)` |
+    | Controls and anti-controls | `.controlled_by(q[0], q[1], control_values=[1, 0])` |
+    | Formula gates X^f(t), Y^f(t), Z^f(t) | `cirq.X(q)**(formula)` |
+    | Formula gates Rx(f(t)), Ry(f(t)), Rz(f(t)) | `cirq.rx(formula)(q)`, `cirq.ry(...)`, `cirq.rz(...)` |
+    | Spinning gates X^t, X^-t, ... | `cirq.X(q)**(t + 1)`, `cirq.X(q)**(-(t + 1))` |
+    | Spinning gates e^-iXt, e^iXt, ... | `cirq.rx(2*sympy.pi*(t + 1))(q)`, `cirq.rx(-2*sympy.pi*(t + 1))(q)` |
+    | QFT, QFT† | `cirq.qft(*reversed(q[0:3]))`, with `inverse=True` for QFT† |
+    | Grad^½, Grad^-½ | `cirq.PhaseGradientGate(num_qubits=3, exponent=0.5)(*reversed(q[0:3]))` |
+    | i, -i, -1, √i, √-i | `cirq.global_phase_operation(1j)`, and so on |
+    | Custom gates made from a unitary matrix | `gate_name = cirq.MatrixGate(np.array([[...]]), name='...')`, used as `gate_name(q[0])` |
+
+- **Time.** `t` is the time variable of QubitBoard's formula gates, which runs from -1 to 1. The spinning gates make a full turn over that range, which is why X^t is written `cirq.X(q)**(t + 1)`. To run the code in Cirq, give `t` a value with `cirq.resolve_parameters(circuit, {'t': 0.5})`.
+- **Qubit order.** Cirq's multi-qubit gates treat their first qubit as the high bit, while QubitBoard's top wire is the low bit. That is why gates covering several wires list their qubits from the bottom up, with `*reversed(q[0:3])`. For the same reason, Cirq prints a state as `|q0 q1 q2⟩` while QubitBoard's kets read `|q2 q1 q0⟩`.
+- Everything else is written on a `# @qb` comment line in [the QubitBoard language](#the-qubitboard-language), e.g. `# @qb Chance3 q[0]`. Cirq ignores these lines, but QubitBoard reads them back, so nothing is lost when you run the code. This covers displays, postselection, arithmetic and input gates, bit-reordering gates, initial states, custom gates made from a circuit, and the following, which are planned for a later version: X/Y-axis controls, parity controls and the detector gates.
+- Formulas follow the same rules as Python: `-t^2` means -(t²) and `2^3^2` means 2^(3²). A formula is kept on a `# @qb` line only when it uses something Python doesn't have, such as `2pi` without a space, `sin pi` without parentheses, or the imaginary unit `i`.
+
+When reading Cirq, QubitBoard understands a flat program: qubit declarations, custom gate definitions and one circuit.
+
+- Qubits: `q = cirq.LineQubit.range(n)`, `a, b = cirq.LineQubit.range(2)` and `cirq.LineQubit(i)`. If you leave out the declaration, qubits called `q` are assumed.
+- The circuit: `cirq.Circuit([...])` or `cirq.Circuit(...)` on one line or many, holding moments, lists or plain operations, and `circuit.append(...)`.
+- Gates: everything in the table above, plus `cirq.CNOT`, `cirq.CX`, `cirq.CZ`, `cirq.CCX`, `cirq.TOFFOLI`, `cirq.CCZ`, `cirq.CSWAP`, `cirq.FREDKIN`, `gate.on(...)`, `gate.on_each(...)`, `cirq.XPowGate(exponent=...)` and `cirq.Rx(rads=...)`.
+- Angles and exponents: numbers, `t`, `+ - * / **`, and `pi`, `E`, `sin`, `cos`, `tan`, `asin`, `acos`, `atan`, `sqrt`, `exp` and `log` from `sympy`, `np` or `math`.
+
+`import` and `print(...)` lines are accepted and ignored.
+Loops, functions, `if` and other Python statements aren't supported, and neither are other Cirq gates (such as `cirq.ISWAP`) or qubit types (such as `cirq.GridQubit`).
+
+Statements on separate lines always go in separate columns.
+Operations on the same line share a column when they don't touch the same qubits and have the same controls; otherwise they are split into consecutive columns.
+
 ## The QubitBoard language
 
-This is QubitBoard's own language, and the default.
+This is QubitBoard's own language.
 It can describe everything QubitBoard can simulate (displays, arithmetic, inputs, postselection, custom gates and initial states included), so converting between a circuit and its code never loses anything.
 
 Each line is one column of the circuit, and the gates listed on a line act at the same time:
@@ -138,6 +200,7 @@ Chance3 q0          # a chance display over q0..q2
 
 - Gates that take a value have it in square brackets: formulas for formula gates, such as `Rxft[pi t^2]`, and numbers for the input-setting gates, such as `setA[5]`.
 - A custom gate is defined on a `gate` line holding its JSON before it's used, e.g. `gate ~inv = {"id":"~inv","name":"Inv","matrix":"{{0,1},{1,0}}"}` followed by `~inv q0`. These lines appear automatically for custom gates made with **Make Gate**.
+- A line holding just `skip` is an empty column. It only appears, and only has an effect, under a wide gate such as an amplitude display or a formula gate, where it keeps the next gates from moving left into the space beside it. Anywhere else an empty column is removed.
 - Two gates on one line can't overlap. For example, `QFT3 q0, H q1` is an error, because QFT3 on q0 already covers q1.
 - Circuits typed in code are tidied up the same way as dragged ones. For example, a gate typed right after a wide gate (such as a formula gate) moves over to make room, exactly as it would if you dropped it there.
 
@@ -203,7 +266,7 @@ But QubitBoard is a simulator, so it doesn't have to play by those rules.
 
 For example, here is a circuit using (from left to right) Bloch sphere displays, an amplitude display, a chance display, and a density matrix display:
 
-![Displays](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_various-displays.png)
+![Displays](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_various-displays.png)
 
 A big part of using QubitBoard effectively amounts to putting the right kind of display in the right place.
 In fact, it's often beneficial to perform additional quantum gates purely to make the information shown in the displays more useful.
@@ -212,7 +275,7 @@ Here are the four important kinds of displays.
 
 - **Chance Display**
 
-    ![chance display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_chance-display.png)
+    ![chance display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_chance-display.png)
 
     This resizable display shows the probability of computational basis states.
     To be more concrete, if you were planning to measure the qubits covered by a chance display in the computation basis (the Z basis), then the chance display shows the probability of each possible measurement result.
@@ -223,7 +286,7 @@ Here are the four important kinds of displays.
 
 - **Bloch Sphere Display**
 
-    ![bloch sphere display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_bloch-display.png)
+    ![bloch sphere display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_bloch-display.png)
 
     This display shows the [Bloch vector representation](https://en.wikipedia.org/wiki/Bloch_sphere) of a single qubit's state.
     You can view the exact coordinates by hovering over the display, or just look at the pseudo-3d indicator to get a sense of where it is.
@@ -233,7 +296,7 @@ Here are the four important kinds of displays.
     The amplitude display is like the chance display, except it shows amplitudes instead of probabilities.
     It tells you the quantum amplitude of each computation basis state of the qubits covered by the display.
 
-    ![amplitude display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_amp-display.png)
+    ![amplitude display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_amp-display.png)
 
     Each square section in an amplitude display represents one of the amplitudes.
     The radius of the light blue circle is the amplitude's magnitude, and the angle of the black line indicator is the amplitude's phase.
@@ -252,7 +315,7 @@ Here are the four important kinds of displays.
 
     The density matrix display is like the amplitude display, except it shows the components of the density matrix of covered qubits instead of the components of the superposition.
 
-    ![density matrix display](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_density-display.png)
+    ![density matrix display](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_density-display.png)
 
     The advantage of the density matrix display over the amplitude display is that it works even if there is entanglement between the covered qubits and other qubits.
     The downside is that it contains significantly more information; it's harder to read.
@@ -268,11 +331,11 @@ For example, in the following circuit, we want a T state to be produced on the f
 If we just put an amplitude display on the first qubit, we aren't able to tell what's going on.
 But if we condition on the other two qubits being off, we can see the state we care about.
 
-![control displays example](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_controlled-display.png)
+![control displays example](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_controlled-display.png)
 
 We can also use controlled displays to get insight into entangled states, by seeing how one qubit's state depends on another along various axes:
 
-![epr conditioning](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_controlled-epr-display.png)
+![epr conditioning](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_controlled-epr-display.png)
 
 # Measurement and Detectors
 
@@ -284,7 +347,7 @@ The answer to this question depends on whether or not you condition on the measu
 If you don't condition on the measurement result, the state of the qubit is described by a 2x2 maximally mixed density matrix.
 If you do condition on the result, then half of the time the post-measurement state will be |0⟩ and the other half of the time it will be |1⟩.
 
-![measurement types](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_measurement-types.png)
+![measurement types](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_measurement-types.png)
 
 When you are attempting to explore all the possible outcomes in a structured way, the first type of measurement is more useful.
 The simulation will explore all of the measurement results, and then you can use controlled displays to look at the individual cases at your leisure.
@@ -319,7 +382,7 @@ A happy coincidence of this layout is that, when applying an operation to one ha
 
 For example, note how the output display of this circuit is showing the matrix of a Fourier transform:
 
-![qft matrix](https://github.com/rogersmukiibi/QubitBoard/blob/master/doc/MANUAL_state-channel-duality.png)
+![qft matrix](https://github.com/rogersmukiibi/QubitBoard/blob/main/doc/MANUAL_state-channel-duality.png)
 
 ## URL Circuit Editing
 
@@ -333,14 +396,14 @@ This makes it easy to do some tasks that would otherwise be tedious.
 For example, suppose you have a circuit with a few dozen Hadamards and you want to replace those Hadamards with Y gates.
 You can do this slowly with a lot of mouse dragging, or quickly by copying the URL into a text editor then using the text editor's replace-all functionality to replace `"H"` with `"Y"` then pasting back into the address bar and hitting enter.
 
-The [code panel](#the-code-panel) is usually an easier way to make this kind of edit, since it shows the same gate ids one column per line and applies your changes when you press Ctrl+Enter.
+The [code panel](#the-code-panel) is usually an easier way to make this kind of edit. With the **QubitBoard** language selected, it shows the same gate ids one column per line and applies your changes when you press Ctrl+Enter.
 
-To delete or edit a custom gate, change or remove its `gate` line in the code panel (along with any lines that use it), or edit the `gates` list in the URL.
+To delete or edit a custom gate, change or remove its definition line in the code panel (along with any lines that use it), or edit the `gates` list in the URL.
 
 ## Unlisted Gates
 
 QubitBoard has gates that aren't included in the toolboxes.
-You can only access these gates by typing their ID, either in the [code panel](#the-code-panel) (e.g. `+cntA2 q0`) or into the URL.
+You can only access these gates by typing their ID, either in the [code panel](#the-code-panel) with the **QubitBoard** language selected (e.g. `+cntA2 q0`) or into the URL.
 These gates include, but are not limited to:
 
 - `"^=A2"`: The XOR gate.

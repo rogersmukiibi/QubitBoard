@@ -91,6 +91,10 @@ function _translate_token(token, tokenMap) {
 
 /**
  * Parses a value from an infix arithmetic expression.
+ *
+ * Follows the usual conventions (the same ones as Python): powers group from the right and bind tighter than a
+ * leading sign, so "-2^2" is -(2^2) and "2^3^2" is 2^(3^2). Tokens opt into this with `right_associative` and
+ * `unary_priority`. A unary token without a `unary_priority`, such as a function, applies to just the next value.
  * @param {!string} text
  * @param {!Map.<!string, T|!string|!number>} tokenMap
  * @returns {T}
@@ -136,10 +140,10 @@ function parseFormula(text, tokenMap) {
         }
     };
 
-    let burnOps = w => {
+    let burnOps = (w, rightAssociative=false) => {
         while (ops.length > 0 && vals.length >= 2 && vals[vals.length - 1] !== undefined) {
             let top = ops[ops.length - 1];
-            if (top.w === undefined || top.w < w) {
+            if (top.w === undefined || top.w < w || (rightAssociative && top.w === w)) {
                 break;
             }
             apply(ops.pop());
@@ -155,12 +159,15 @@ function parseFormula(text, tokenMap) {
         }
 
         if (couldBeBinary && token.binary_action !== undefined) {
-            burnOps(token.priority);
+            burnOps(token.priority, token.right_associative);
             ops.push({f: token.binary_action, w: token.priority});
         } else if (token.unary_action !== undefined) {
-            burnOps(token.priority);
+            // A prefix operator never completes the operators before it: their right operand is still to come.
             vals.push(undefined);
-            ops.push({f: (a, b) => token.unary_action(b), w: Infinity});
+            ops.push({
+                f: (a, b) => token.unary_action(b),
+                w: token.unary_priority === undefined ? Infinity : token.unary_priority
+            });
         } else if (token.binary_action !== undefined) {
             throw new DetailedError("Bad expression: binary op in bad spot", {text});
         }
