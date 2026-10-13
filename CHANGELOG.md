@@ -15,6 +15,31 @@ behave differently is marked **(breaking)**.
 
 ## Unreleased
 
+### Added
+
+- **Gate reference** in the documentation: every gate in the two toolboxes, with a page per toolbox and a section per
+  toolbox group, showing each gate's picture, name, id, sizes and effect. A unit test fails when the pages and the
+  toolboxes in `src/gates/AllGates.js` disagree, and `npm run screenshot-gates` retakes the pictures from the app.
+
+### Changed
+
+- **The user guide is now a documentation site** at <https://rogersmukiibi.com/QubitBoard/docs/>, with a sidebar,
+  search and a page per topic in place of the single wiki page. It is built from `doc/` by VitePress
+  (`npm run build-docs`) and published next to the app by the Pages workflow. The menu's **User Guide** link opens it,
+  and the wiki guide is now a pointer to it.
+- The screenshots and GIFs in `doc/` moved to `doc/images/`, and the favicon to `doc/public/`.
+
+### Fixed
+
+- **Gate tooltips.** Only the text changed; the gates behave as before.
+  - The Hadamard gate's tooltip had its two cases the wrong way round. It now says that H maps OFF to OFF + ON and ON
+    to OFF - ON.
+  - The Y-axis controls and Y-axis postselection gates named the opposite state to the one they use. The X and Y axis
+    tooltips now write every state with OFF first: OFF+ON, OFF-ON, OFF+iON and OFF-iON.
+  - "Principle" is now "principal" in the tooltips of the root gates, such as √X and Z^¼.
+  - The phase gradient tooltips say "proportional to its value", Postselect On writes ON and OFF in capitals like the
+    other gates, and Postselect Y-Off says "discards/retries".
+
 ## 2.5.0 (2026-10-12)
 
 ### Changed

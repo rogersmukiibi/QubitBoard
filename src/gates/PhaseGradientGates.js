@@ -50,7 +50,7 @@ PhaseGradientGates.PhaseGradientFamily = Gate.buildFamily(1, 16, (span, builder)
     setSerializedId("PhaseGradient" + span).
     setSymbol("Grad^½").
     setTitle("Half Gradient Gate").
-    setBlurb("Phases the target by an amount proportional its value.").
+    setBlurb("Phases the target by an amount proportional to its value.").
     setActualEffectToShaderProvider(ctx => PHASE_GRADIENT_SHADER.withArgs(
         ...ketArgs(ctx, span),
         WglArg.float("factor", Math.PI / (1 << span)))).
@@ -61,7 +61,7 @@ PhaseGradientGates.PhaseDegradientFamily = Gate.buildFamily(1, 16, (span, builde
     setSerializedId("PhaseUngradient" + span).
     setSymbol("Grad^-½").
     setTitle("Inverse Half Gradient Gate").
-    setBlurb("Counter-phases the target by an amount proportional its value.").
+    setBlurb("Counter-phases the target by an amount proportional to its value.").
     setActualEffectToShaderProvider(ctx => PHASE_GRADIENT_SHADER.withArgs(
         ...ketArgs(ctx, span),
         WglArg.float("factor", -Math.PI / (1 << span)))).
@@ -71,7 +71,7 @@ PhaseGradientGates.DynamicPhaseGradientFamily = Gate.buildFamily(1, 16, (span, b
     setSerializedId("grad^t" + span).
     setSymbol("Grad^t").
     setTitle("Cycling Gradient Gate").
-    setBlurb("Phases the target by a cycling amount proportional its value.").
+    setBlurb("Phases the target by a cycling amount proportional to its value.").
     setActualEffectToShaderProvider(ctx => PHASE_GRADIENT_SHADER.withArgs(
         ...ketArgs(ctx, span),
         WglArg.float("factor", ctx.time * Math.PI * 2))).
@@ -86,7 +86,7 @@ PhaseGradientGates.DynamicPhaseDegradientFamily = Gate.buildFamily(1, 16, (span,
     setSerializedId("grad^-t" + span).
     setSymbol("Grad^-t").
     setTitle("Inverse Cycling Gradient Gate").
-    setBlurb("Counter-phases the target by a cycling amount proportional its value.").
+    setBlurb("Counter-phases the target by a cycling amount proportional to its value.").
     setActualEffectToShaderProvider(ctx => PHASE_GRADIENT_SHADER.withArgs(
         ...ketArgs(ctx, span),
         WglArg.float("factor", -ctx.time * Math.PI * 2))).

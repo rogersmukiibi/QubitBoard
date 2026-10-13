@@ -23,7 +23,7 @@ VariousYGates.Y3 = Gate.fromKnownMatrix(
     "Y^⅓",
     Matrix.fromPauliRotation(0, 1 / 6, 0),
     "Y^⅓ Gate",
-    "Principle third root of Y.");
+    "Principal third root of Y.");
 VariousYGates.Y3i = Gate.fromKnownMatrix(
     "Y^-⅓",
     Matrix.fromPauliRotation(0, -1 / 6, 0),
@@ -35,7 +35,7 @@ VariousYGates.Y4 = Gate.fromKnownMatrix(
     "Y^¼",
     Matrix.fromPauliRotation(0, 1 / 8, 0),
     "Y^¼ Gate",
-    "Principle fourth root of Y.");
+    "Principal fourth root of Y.");
 VariousYGates.Y4i = Gate.fromKnownMatrix(
     "Y^-¼",
     Matrix.fromPauliRotation(0, -1 / 8, 0),
@@ -47,7 +47,7 @@ VariousYGates.Y8 = Gate.fromKnownMatrix(
     "Y^⅛",
     Matrix.fromPauliRotation(0, 1 / 16, 0),
     "Y^⅛ Gate",
-    "Principle eighth root of Y.");
+    "Principal eighth root of Y.");
 VariousYGates.Y8i = Gate.fromKnownMatrix(
     "Y^-⅛",
     Matrix.fromPauliRotation(0, -1 / 16, 0),
@@ -59,7 +59,7 @@ VariousYGates.Y16 = Gate.fromKnownMatrix(
     "Y^⅟₁₆",
     Matrix.fromPauliRotation(0, 1 / 32, 0),
     "Y^⅟₁₆ Gate",
-    "Principle sixteenth root of Y.");
+    "Principal sixteenth root of Y.");
 VariousYGates.Y16i = Gate.fromKnownMatrix(
     "Y^-⅟₁₆",
     Matrix.fromPauliRotation(0, -1 / 32, 0),
@@ -71,7 +71,7 @@ VariousYGates.Y32 = Gate.fromKnownMatrix(
     "Y^⅟₃₂",
     Matrix.fromPauliRotation(0, 1 / 64, 0),
     "Y^⅟₃₂ Gate",
-    "Principle 32'nd root of Y.");
+    "Principal 32'nd root of Y.");
 VariousYGates.Y32i = Gate.fromKnownMatrix(
     "Y^-⅟₃₂",
     Matrix.fromPauliRotation(0, -1 / 64, 0),

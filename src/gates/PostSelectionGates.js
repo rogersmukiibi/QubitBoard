@@ -50,7 +50,7 @@ PostSelectionGates.PostSelectOn = new GateBuilder().
     setAlternate(PostSelectionGates.PostSelectOff).
     setSerializedIdAndSymbol("|1⟩⟨1|").
     setTitle("Postselect On").
-    setBlurb("Keeps On states, discards/retries Off states.").
+    setBlurb("Keeps ON states, discards/retries OFF states.").
     setDrawer(POST_SELECT_DRAWER).
     setKnownEffectToMatrix(Matrix.square(0, 0, 0, 1)).
     gate;
@@ -60,7 +60,7 @@ PostSelectionGates.PostSelectAntiX = new GateBuilder().
     setSerializedId("|+⟩⟨+|").  // The +/- drawing convention was switched, but the serialized id must stay the same.
     setSymbol("|+⟩⟨+|").
     setTitle("Postselect X-Off").
-    setBlurb("Keeps ON+OFF states, discards/retries ON-OFF states.").
+    setBlurb("Keeps OFF+ON states, discards/retries OFF-ON states.").
     setDrawer(POST_SELECT_DRAWER).
     setKnownEffectToMatrix(Matrix.square(1, 1, 1, 1).times(0.5)).
     gate;
@@ -71,7 +71,7 @@ PostSelectionGates.PostSelectX = new GateBuilder().
     setSerializedId("|-⟩⟨-|").  // The +/- drawing convention was switched, but the serialized id must stay the same.
     setSymbol("|-⟩⟨-|").
     setTitle("Postselect X-On").
-    setBlurb("Keeps ON-OFF states, discards/retries ON+OFF states.").
+    setBlurb("Keeps OFF-ON states, discards/retries OFF+ON states.").
     setDrawer(POST_SELECT_DRAWER).
     setKnownEffectToMatrix(Matrix.square(1, -1, -1, 1).times(0.5)).
     gate;
@@ -81,7 +81,7 @@ PostSelectionGates.PostSelectAntiY = new GateBuilder().
     setSerializedId("|X⟩⟨X|").  // The cross/slash convention was switched, but the serialized id must stay the same.
     setSymbol("|i⟩⟨i|").
     setTitle("Postselect Y-Off").
-    setBlurb("Keeps ON+iOFF states, discards ON-iOFF states.").
+    setBlurb("Keeps OFF+iON states, discards/retries OFF-iON states.").
     setDrawer(POST_SELECT_DRAWER).
     setKnownEffectToMatrix(Matrix.square(1, Complex.I.neg(), Complex.I, 1).times(0.5)).
     gate;
@@ -92,7 +92,7 @@ PostSelectionGates.PostSelectY = new GateBuilder().
     setSerializedId("|/⟩⟨/|").  // The cross/slash convention was switched, but the serialized id must stay the same.
     setSymbol("|-i⟩⟨-i|").
     setTitle("Postselect Y-On").
-    setBlurb("Keeps ON-iOFF states, discards/retries ON+iOFF states.").
+    setBlurb("Keeps OFF-iON states, discards/retries OFF+iON states.").
     setDrawer(POST_SELECT_DRAWER).
     setKnownEffectToMatrix(Matrix.square(1, Complex.I, Complex.I.neg(), 1).times(0.5)).
     gate;

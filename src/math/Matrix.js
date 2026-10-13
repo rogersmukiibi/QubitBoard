@@ -273,7 +273,7 @@ class Matrix {
 
     /**
      * Converts the array of complex coefficients into a column vector.
-     * @param {!number|!Complex} coefs
+     * @param {...(!number|!Complex)} coefs
      * @returns {!Matrix}
      */
     static col(...coefs) {

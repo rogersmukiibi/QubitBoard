@@ -23,7 +23,7 @@ let QuarterTurnGates = {};
 QuarterTurnGates.SqrtXForward = new GateBuilder().
     setSerializedIdAndSymbol('X^½').
     setTitle("√X Gate").
-    setBlurb("Principle square root of Not.").
+    setBlurb("Principal square root of Not.").
     setKnownEffectToMatrix(Matrix.fromPauliRotation(0.25, 0, 0)).
     gate;
 
@@ -40,7 +40,7 @@ QuarterTurnGates.SqrtXBackward = new GateBuilder().
 QuarterTurnGates.SqrtYForward = new GateBuilder().
     setSerializedIdAndSymbol('Y^½').
     setTitle("√Y Gate").
-    setBlurb("Principle square root of Y.").
+    setBlurb("Principal square root of Y.").
     setKnownEffectToMatrix(Matrix.fromPauliRotation(0, 0.25, 0)).
     gate;
 
@@ -58,7 +58,7 @@ QuarterTurnGates.SqrtZForward = new GateBuilder().
     setSerializedId('Z^½').
     setSymbol('S').
     setTitle("√Z Gate").
-    setBlurb("Principle square root of Z.\nAlso known as the 'S' gate.").
+    setBlurb("Principal square root of Z.\nAlso known as the 'S' gate.").
     setKnownEffectToMatrix(Matrix.fromPauliRotation(0, 0, 0.25)).
     gate;
 

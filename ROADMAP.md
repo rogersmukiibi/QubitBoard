@@ -34,7 +34,11 @@ Each of these gates currently stays on a `# @qb` comment line. They are listed i
 
 ### Documentation
 
-- Retake `doc/MANUAL_code-panel.png`: it shows the QubitBoard language as the default.
+- Retake `doc/images/code-panel.png`: it shows the QubitBoard language as the default.
+- **Move VitePress to a stable release.** `vitepress` is pinned to `2.0.0-alpha.20`, because the latest stable version
+  (1.6.4) depends on a Vite and an esbuild that `npm audit` reports. Move to 2.0 once it is released.
+- **Developer documentation on the site.** Building, the TypeScript migration and deployment are still described in
+  `README.md` and `AGENTS.md` only.
 
 ### Tooling
 

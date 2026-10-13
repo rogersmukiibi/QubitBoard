@@ -23,7 +23,7 @@ VariousZGates.Z3 = Gate.fromKnownMatrix(
     "Z^⅓",
     Matrix.fromPauliRotation(0, 0, 1 / 6),
     "Z^⅓ Gate",
-    "Principle third root of Z.");
+    "Principal third root of Z.");
 VariousZGates.Z3i = Gate.fromKnownMatrix(
     "Z^-⅓",
     Matrix.fromPauliRotation(0, 0, -1 / 6),
@@ -35,7 +35,7 @@ VariousZGates.Z4 = Gate.fromKnownMatrix(
     "T",
     Matrix.fromPauliRotation(0, 0, 1 / 8),
     "Z^¼ Gate",
-    "Principle fourth root of Z.",
+    "Principal fourth root of Z.",
     "Z^¼");
 VariousZGates.Z4i = Gate.fromKnownMatrix(
     "T^-1",
@@ -48,7 +48,7 @@ VariousZGates.Z8 = Gate.fromKnownMatrix(
     "Z^⅛",
     Matrix.fromPauliRotation(0, 0, 1 / 16),
     "Z^⅛ Gate",
-    "Principle eighth root of Z.");
+    "Principal eighth root of Z.");
 VariousZGates.Z8i = Gate.fromKnownMatrix(
     "Z^-⅛",
     Matrix.fromPauliRotation(0, 0, -1 / 16),
@@ -60,7 +60,7 @@ VariousZGates.Z16 = Gate.fromKnownMatrix(
     "Z^⅟₁₆",
     Matrix.fromPauliRotation(0, 0, 1 / 32),
     "Z^⅟₁₆ Gate",
-    "Principle 16'th root of Z.");
+    "Principal 16'th root of Z.");
 VariousZGates.Z16i = Gate.fromKnownMatrix(
     "Z^-⅟₁₆",
     Matrix.fromPauliRotation(0, 0, -1 / 32),
@@ -73,17 +73,17 @@ VariousZGates.Z32 = Gate.fromKnownMatrix(
     "Z^⅟₃₂",
     Matrix.fromPauliRotation(0, 0, 1 / 64),
     "Z^⅟₃₂ Gate",
-    "Principle 32'nd root of Z.");
+    "Principal 32'nd root of Z.");
 VariousZGates.Z64 = Gate.fromKnownMatrix(
     "Z^⅟₆₄",
     Matrix.fromPauliRotation(0, 0, 1 / 128),
     "Z^⅟₆₄ Gate",
-    "Principle 64'th root of Z.");
+    "Principal 64'th root of Z.");
 VariousZGates.Z128 = Gate.fromKnownMatrix(
     "Z^⅟₁₂₈",
     Matrix.fromPauliRotation(0, 0, 1 / 256),
     "Z^⅟₁₂₈ Gate",
-    "Principle 128'th root of Z.");
+    "Principal 128'th root of Z.");
 
 VariousZGates.all =[
     VariousZGates.Z3,
