@@ -28,9 +28,9 @@ Open an issue at <https://github.com/rogersmukiibi/QubitBoard/issues>. For bugs,
 
     Under WSL or in a container, prefix the test command with `PUPPETEER_NO_SANDBOX=1`.
 6. Build the app with `npm run build` and try your change in `out/qubitboard.html`.
-7. If your change affects how QubitBoard is used, update the user guide in
-   [`doc/wiki/Qubit-Board-Guide.md`](doc/wiki/Qubit-Board-Guide.md). The wiki is published from that folder when your
-   change reaches `main`, so edit it there rather than on the wiki website.
+7. If your change affects how QubitBoard is used, update the documentation in [`doc/`](doc/README.md) and preview it
+   with `npm run serve-docs`. The [documentation site](https://rogersmukiibi.com/QubitBoard/docs/) is published from
+   that folder when your change reaches `main`.
 8. Add an entry to the **Unreleased** section of [`CHANGELOG.md`](CHANGELOG.md). Planned work and known issues are
    tracked in [`ROADMAP.md`](ROADMAP.md).
 

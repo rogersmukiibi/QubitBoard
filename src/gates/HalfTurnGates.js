@@ -108,8 +108,8 @@ HalfTurnGates.H = new GateBuilder().
     setSerializedIdAndSymbol("H").
     setTitle("Hadamard Gate").
     setBlurb("Creates simple superpositions.\n" +
-        "Maps ON to ON + OFF.\n" +
-        "Maps OFF to ON - OFF.").
+        "Maps OFF to OFF + ON.\n" +
+        "Maps ON to OFF - ON.").
     setActualEffectToShaderProvider(ctx => hShader.withArgs(...ketArgs(ctx))).
     setKnownEffectToMatrix(Matrix.HADAMARD).
     gate;

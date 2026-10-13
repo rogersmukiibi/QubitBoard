@@ -26,8 +26,8 @@ shaders.
 | `html/` | Page template and partials, which are injected at build time by `build.mjs` |
 | `test/` | Unit tests; `test/**/*.test.{js,ts}` mirrors `src/` |
 | `test_perf/` | Performance tests (`*.perf.js`) |
-| `doc/` | Quick reference (`doc/README.md`) and the guide's images |
-| `doc/wiki/` | Source of the GitHub wiki pages, including the user guide; published by `.github/workflows/wiki.yml` |
+| `doc/` | Source of the documentation site: `guide/`, `gates/`, `code/` and `reference/` pages, `images/`, and the site config in `.vitepress/config.ts`. `doc/README.md` explains the layout |
+| `doc/wiki/` | The page left on the GitHub wiki to point old links at the documentation site; published by `.github/workflows/wiki.yml` |
 | `build.mjs` | Build script behind the `npm run build*` commands |
 | `CHANGELOG.md` | What changed in each version |
 | `ROADMAP.md` | Planned work, known issues and past design decisions |
@@ -47,6 +47,8 @@ shaders.
 - Imports use relative paths with the `.js` extension, including imports of `.ts` modules, e.g.
   `import {Rect} from "../math/Rect.js"`.
 - Source files start with the Apache 2.0 license header. Copy it into any new file.
+- The documentation site is built by **VitePress** (`npm run build-docs`), separately from `build.mjs`. Its config,
+  `doc/.vitepress/config.ts`, is outside `tsconfig.json`, so `npm run typecheck` doesn't cover it.
 
 ## Commands
 
@@ -61,6 +63,9 @@ npm test                             # the two commands above, in one
 node PuppeteerScreenshotCircuit.js   # render a sample circuit to screenshot.png
 npm run test-chrome                  # run unit tests through karma (needs a local Chrome, or CHROME_BIN)
 npm run test-firefox                 # same, with Firefox
+npm run build-docs                   # build the documentation site -> out/docs/
+npm run serve-docs                   # preview the documentation at localhost:5173/QubitBoard/docs/
+npm run screenshot-gates             # after a build: save a picture of every toolbox gate to doc/images/gates/
 ```
 
 Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers, WSL, CI).
@@ -79,10 +84,18 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 
 ## CI
 
-- `.github/workflows/ci.yml` builds, runs the Puppeteer test suite, and uploads a screenshot on every push and PR.
-- `.github/workflows/pages.yml` builds and deploys to GitHub Pages on pushes to `main`.
-- `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `main` that change it. Update the
-  guide in `doc/wiki/Qubit-Board-Guide.md` when a change affects how QubitBoard is used; never edit the wiki directly.
+- `.github/workflows/ci.yml` builds, runs the Puppeteer test suite, uploads a screenshot, and builds the documentation
+  site on every push and PR.
+- `.github/workflows/pages.yml` builds the app and the documentation site and deploys both to GitHub Pages on pushes to
+  `main`: the app as `index.html`, the documentation under `docs/`.
+- Update the pages in `doc/` when a change affects how QubitBoard is used, and add new pages to the sidebar in
+  `doc/.vitepress/config.ts`. `npm run build-docs` fails on a link to a page that doesn't exist.
+- When a gate is added to, removed from or moved within a toolbox in `src/gates/AllGates.js`, update
+  `doc/gates/top-toolbox.md` or `doc/gates/bottom-toolbox.md` to match, and regenerate the gate pictures with
+  `npm run build && npm run screenshot-gates`. `test/doc/ToolboxGatesDoc.test.ts` fails when a gate has no table row
+  or a row has no picture.
+- `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `main` that change it. The wiki
+  only points to the documentation site; never edit it directly.
 
 ## Changelog and roadmap
 
@@ -104,5 +117,5 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 - Match the style of the surrounding code: 4-space indentation, type annotations on public methods (JSDoc in `.js`
   files, TypeScript types in `.ts` files), and immutable value classes with `isEqualTo` and `toString`.
 - Keep comments sparse. Don't add comments that restate the code.
-- Wire ordering: the top wire is the low bit, and kets are big-endian. See `doc/README.md` for the user-facing
-  conventions.
+- Wire ordering: the top wire is the low bit, and kets are big-endian. See `doc/reference/conventions.md` for the
+  user-facing conventions.

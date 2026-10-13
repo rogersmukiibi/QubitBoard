@@ -1,4 +1,4 @@
-# <a href="https://rogersmukiibi.com/QubitBoard/">QubitBoard <img src="doc/favicon.ico" alt="Icon" title="Icon" /></a>
+# <a href="https://rogersmukiibi.com/QubitBoard/">QubitBoard <img src="doc/public/favicon.ico" alt="Icon" title="Icon" /></a>
 
 [![ci](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/ci.yml)
 [![deploy-pages](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml/badge.svg)](https://github.com/rogersmukiibi/QubitBoard/actions/workflows/pages.yml)
@@ -29,22 +29,24 @@ QubitBoard assumes you already know background facts like "each wire represents 
 
 **[rogersmukiibi.com/QubitBoard](https://rogersmukiibi.com/QubitBoard/)**
 
-**Learn it**: the [Qubit Board Guide](https://github.com/rogersmukiibi/QubitBoard/wiki/Qubit-Board-Guide),
-the [tutorial video](https://youtu.be/hiMqqOVrBg0), and the [controls and conventions reference](doc/README.md).
+**Learn it**: the [documentation](https://rogersmukiibi.com/QubitBoard/docs/), the
+[tutorial video](https://youtu.be/hiMqqOVrBg0), and the
+[controls](https://rogersmukiibi.com/QubitBoard/docs/reference/controls) and
+[conventions](https://rogersmukiibi.com/QubitBoard/docs/reference/conventions) references.
 
 # Examples
 
 **Basic usage demo**:
 
-![Demo](/doc/README_Demo.gif)
+![Demo](/doc/images/demo.gif)
 
 **Grover search circuit** with chance and sample displays (showing that the chance of success increases):
 
-![Grover search](/doc/README_Grover.gif)
+![Grover search](/doc/images/grover.gif)
 
 **Quantum teleportation circuit** with Bloch sphere displays (showing that the qubit at the top has ended up at the bottom):
 
-![Quantum teleportation](/doc/README_Teleportation.gif)
+![Quantum teleportation](/doc/images/teleportation.gif)
 
 # Building
 
@@ -122,10 +124,14 @@ Pushes to `main` are also built and published to GitHub Pages by
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which runs the same build as `npm run build` and publishes
 `out/qubitboard.html` as the site's `index.html`.
 
-The [wiki](https://github.com/rogersmukiibi/QubitBoard/wiki) is published from this repository too. Its pages live in
-[`doc/wiki/`](doc/wiki), and [`.github/workflows/wiki.yml`](.github/workflows/wiki.yml) copies them to the wiki whenever
-a push to `main` changes them. Edit the guide in `doc/wiki/`, not on the wiki website: edits made there are
-overwritten by the next sync.
+The [documentation site](https://rogersmukiibi.com/QubitBoard/docs/) is published by the same workflow. Its pages live
+in [`doc/`](doc) and are built by [VitePress](https://vitepress.dev/): `npm run build-docs` writes the site to
+`out/docs/`, which is published as the site's `docs/` folder. Run `npm run serve-docs` to preview the pages while you
+edit them. [`doc/README.md`](doc/README.md) explains how they are organized.
+
+The [wiki](https://github.com/rogersmukiibi/QubitBoard/wiki) only holds a page pointing to the documentation site.
+[`.github/workflows/wiki.yml`](.github/workflows/wiki.yml) copies that page from [`doc/wiki/`](doc/wiki), so edits
+made on the wiki website are overwritten by the next sync.
 
 # Credits
 

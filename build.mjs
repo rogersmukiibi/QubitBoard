@@ -59,6 +59,7 @@ const bundle = async (entry, outfile, minify) => {
         target: TARGET,
         minify,
         keepNames: true,
+        loader: {'.md': 'text'},
         sourcemap: minify ? false : 'inline',
         // The pages inject the bundle mid-script, where a leading "use strict" would have no effect.
         banner: {js: '(function() { "use strict";'},
