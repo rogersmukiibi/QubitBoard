@@ -23,7 +23,6 @@ import type {Revision} from "../base/Revision.js"
 const STORAGE_KEY_LANGUAGE = 'qubitboard.codePanel.language';
 const STORAGE_KEY_HEIGHT = 'qubitboard.codePanel.height';
 const STORAGE_KEY_COLLAPSED = 'qubitboard.codePanel.collapsed';
-const STORAGE_KEY_CLOSED = 'qubitboard.codePanel.closed';
 const MIN_BODY_HEIGHT = 60;
 const DEFAULT_BODY_HEIGHT = 220;
 
@@ -61,8 +60,6 @@ function initCodePanel(revision: Revision, obsIsAnyOverlayShowing: Observable): 
     const panel = byId<HTMLDivElement>('code-panel');
     const body = byId<HTMLDivElement>('code-panel-body');
     const toggleButton = byId<HTMLButtonElement>('code-panel-toggle');
-    const closeButton = byId<HTMLButtonElement>('code-panel-close');
-    const showButton = byId<HTMLButtonElement>('code-panel-show');
     const languageSelect = byId<HTMLSelectElement>('code-panel-language');
     const runButton = byId<HTMLButtonElement>('code-panel-run');
     const copyButton = byId<HTMLButtonElement>('code-panel-copy');
@@ -189,37 +186,26 @@ function initCodePanel(revision: Revision, obsIsAnyOverlayShowing: Observable): 
         }
     });
 
-    // Size, minimising, closing and page padding.
+    // Size, minimising and page padding.
     let bodyHeight = Number(loadSetting(STORAGE_KEY_HEIGHT)) || DEFAULT_BODY_HEIGHT;
     let collapsed = loadSetting(STORAGE_KEY_COLLAPSED) === 'true';
-    let closed = loadSetting(STORAGE_KEY_CLOSED) === 'true';
     const layout = () => {
         let maxHeight = Math.max(MIN_BODY_HEIGHT, Math.floor(window.innerHeight * 0.7));
         bodyHeight = Math.min(Math.max(bodyHeight, MIN_BODY_HEIGHT), maxHeight);
-        panel.style.display = closed ? 'none' : 'block';
         body.style.height = `${bodyHeight}px`;
         body.style.display = collapsed ? 'none' : 'flex';
         resizeHandle.style.display = collapsed ? 'none' : 'block';
         toggleButton.textContent = collapsed ? '▸ Code' : '▾ Code';
         toggleButton.title = collapsed ? 'Show the code' : 'Minimise the code panel';
         toggleButton.setAttribute('aria-expanded', String(!collapsed));
-        showButton.setAttribute('aria-pressed', String(!closed));
-        showButton.title = closed ? 'Open the code panel' : 'Close the code panel';
         // Leave room at the bottom of the page so the panel never hides the end of the circuit.
-        document.body.style.paddingBottom = `${closed ? 0 : panel.offsetHeight}px`;
-    };
-    const setClosed = (value: boolean) => {
-        closed = value;
-        saveSetting(STORAGE_KEY_CLOSED, String(closed));
-        layout();
+        document.body.style.paddingBottom = `${panel.offsetHeight}px`;
     };
     toggleButton.addEventListener('click', () => {
         collapsed = !collapsed;
         saveSetting(STORAGE_KEY_COLLAPSED, String(collapsed));
         layout();
     });
-    closeButton.addEventListener('click', () => setClosed(true));
-    showButton.addEventListener('click', () => setClosed(!closed));
     window.addEventListener('resize', layout);
 
     resizeHandle.addEventListener('pointerdown', e => {
@@ -242,6 +228,7 @@ function initCodePanel(revision: Revision, obsIsAnyOverlayShowing: Observable): 
         resizeHandle.addEventListener('pointercancel', onUp);
     });
 
+    panel.style.display = 'block';
     layout();
 }
 

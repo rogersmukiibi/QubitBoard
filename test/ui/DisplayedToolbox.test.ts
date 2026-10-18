@@ -129,10 +129,18 @@ suite.test("scrollingStopsAtBothEnds", () => {
     let box = toolbox().withViewWidth(800);
     assertThat(box.withScrolledBy(-50).scrollX).isEqualTo(0);
     let end = box.withScrolledBy(1e6);
-    assertThat(end.scrollX).isEqualTo(box.desiredWidth() - 800);
+    assertThat(end.scrollX).isEqualTo(box.desiredWidth() - 400);
     assertThat(end.withScrolledBy(10).scrollX).isEqualTo(end.scrollX);
-    assertThat(end.withViewWidth(1500).scrollX).isEqualTo(box.desiredWidth() - 1500);
+    assertThat(end.withViewWidth(1500).scrollX).isEqualTo(box.desiredWidth() - 750);
     assertThat(end.withViewWidth(1e5).scrollX).isEqualTo(0);
+});
+
+suite.test("theLastGroupsCanBeScrolledToTheMiddle", () => {
+    let end = toolbox().withViewWidth(800).withScrolledBy(1e6);
+    let last = Gates.ToolboxGroups.length - 1;
+    let lastGate = end.gateDrawRect(last, Gates.ToolboxGroups[last].gates.length - 1);
+    assertTrue(lastGate.right() <= 400);
+    assertTrue(lastGate.right() > 300);
 });
 
 suite.test("scrollButtonsShowWhereThereIsMoreToSee", () => {
