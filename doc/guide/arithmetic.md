@@ -15,5 +15,5 @@ The input value A can also be a classical constant specified by a **Set Default 
 ## See also
 
 - [Qubit order](../reference/conventions.md#qubit-order) explains which wire is the low bit of a number.
-- The [Inputs](../gates/bottom-toolbox.md#inputs), [Arithmetic](../gates/bottom-toolbox.md#arithmetic), [Compare](../gates/bottom-toolbox.md#compare) and [Modular](../gates/bottom-toolbox.md#modular) groups of the bottom toolbox list every arithmetic gate.
-- [Unlisted gates](../gates/unlisted-gates.md) lists more arithmetic gates that aren't in the toolboxes.
+- The [Inputs](../gates/toolbox.md#inputs), [Arithmetic](../gates/toolbox.md#arithmetic), [Compare](../gates/toolbox.md#compare) and [Modular](../gates/toolbox.md#modular) groups of the toolbox list every arithmetic gate.
+- [Unlisted gates](../gates/unlisted-gates.md) lists more arithmetic gates that aren't in the toolbox.

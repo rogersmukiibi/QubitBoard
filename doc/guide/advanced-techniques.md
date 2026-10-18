@@ -16,7 +16,7 @@ Some edits are tedious to do by dragging, such as replacing every Hadamard in a 
 You can make them with a text editor's find and replace, either in the [code panel](../code/index.md) or directly in the circuit's link.
 See [Circuit links](../reference/circuit-links.md).
 
-## Use gates that aren't in the toolboxes
+## Use gates that aren't in the toolbox
 
 QubitBoard has gates that can only be placed by typing their id.
 See [Unlisted gates](../gates/unlisted-gates.md).

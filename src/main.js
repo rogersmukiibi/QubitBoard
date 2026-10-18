@@ -111,6 +111,8 @@ let desiredCanvasSizeFor = curInspector => {
  * @returns {!DisplayedInspector}
  */
 const syncArea = ins => {
+    // The toolbox wraps to the width, so the desired height is only known once the width is applied.
+    ins.updateArea(new Rect(0, 0, desiredCanvasSizeFor(ins).w, ins.drawArea.h));
     let size = desiredCanvasSizeFor(ins);
     ins.updateArea(new Rect(0, 0, size.w, size.h));
     return ins;

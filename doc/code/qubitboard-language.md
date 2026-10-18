@@ -37,7 +37,7 @@ Ids with special characters have plain-text names, and either form works:
 | `…` | `spacer` |
 
 The id of every toolbox gate is listed under [Gates](../gates/index.md).
-Gates that aren't in the toolboxes can be used by their id too. See [Unlisted gates](../gates/unlisted-gates.md).
+Gates that aren't in the toolbox can be used by their id too. See [Unlisted gates](../gates/unlisted-gates.md).
 
 ## Arguments
 

@@ -17,14 +17,18 @@ behave differently is marked **(breaking)**.
 
 ### Added
 
-- **Gate reference** in the documentation: every gate in the two toolboxes, with a page per toolbox and a section per
-  toolbox group, showing each gate's picture, name, id, sizes and effect. A unit test fails when the pages and the
-  toolboxes in `src/gates/AllGates.js` disagree, and `npm run screenshot-gates` retakes the pictures from the app.
+- **Gate reference** in the documentation: every gate in the toolbox, with a section per toolbox group, showing each
+  gate's picture, name, id, sizes and effect. A unit test fails when the page and the toolbox in
+  `src/gates/AllGates.js` disagree, and `npm run screenshot-gates` retakes the pictures from the app.
 - `?webgl=1` in the page URL, before the `#`, makes QubitBoard use WebGL1. It is for computers where the WebGL2
   simulation goes wrong. The circuit links page in the documentation describes it.
 
 ### Changed
 
+- **One toolbox above the circuit** in place of a toolbox above it and another below it. The groups of the old bottom
+  toolbox follow those of the top one, and the groups wrap onto more rows when the window is too narrow to show them
+  all, so every gate stays visible without scrolling sideways. The **Custom Gates** group only appears once the
+  circuit has a custom gate. Circuit links and gate ids are unchanged.
 - **Circuits are simulated with WebGL2** when the browser has it, and with WebGL1 otherwise. The shaders are
   unchanged, and the simulation was as fast with either version in the performance tests. The unit tests run under
   both versions.

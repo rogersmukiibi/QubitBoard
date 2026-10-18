@@ -33,7 +33,7 @@ class DisplayedToolbox {
      * @param {!string} name
      * @param {!number} top
      * @param {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} toolboxGroups
-     * @param {!boolean} labelsOnTop
+     * @param {!number=} width Groups that don't fit in this width wrap onto another row.
      * @param {undefined|!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>=} originalGroups
      * @param {undefined|!CachablePainting=undefined} standardAppearance
      */
@@ -41,7 +41,7 @@ class DisplayedToolbox {
             name,
             top,
             toolboxGroups,
-            labelsOnTop,
+            width=Infinity,
             originalGroups=undefined,
             standardAppearance=undefined) {
         /** @type {!String} */
@@ -50,8 +50,8 @@ class DisplayedToolbox {
         this.top = top;
         /** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
         this.toolboxGroups = toolboxGroups;
-        /** @type {!boolean} */
-        this.labelsOnTop = labelsOnTop;
+        /** @type {!number} */
+        this.width = width;
         /** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
         this._originalGroups = originalGroups || this.toolboxGroups;
         /**
@@ -73,14 +73,54 @@ class DisplayedToolbox {
             let h = Math.ceil(group.gates.length / 2);
             this.groupHeight = Math.max(this.groupHeight, h);
         }
+
+        /** @type {!int} */
+        this.groupsPerRow = Math.max(1, toolboxGroups.length);
+        while (this.groupsPerRow > 1 && DisplayedToolbox._rowWidth(this.groupsPerRow) > width) {
+            this.groupsPerRow--;
+        }
+    }
+
+    /**
+     * @param {!int} groupCount
+     * @returns {!number} The width taken by a row of this many groups.
+     * @private
+     */
+    static _rowWidth(groupCount) {
+        return Config.TOOLBOX_MARGIN_X +
+            (groupCount - 1) * Config.TOOLBOX_GROUP_SPAN +
+            Config.TOOLBOX_GATE_SPAN +
+            Config.GATE_RADIUS * 2 +
+            5.5;
+    }
+
+    /**
+     * @param {!number} width
+     * @returns {!DisplayedToolbox}
+     */
+    withWidth(width) {
+        if (width === this.width) {
+            return this;
+        }
+        let result = new DisplayedToolbox(
+            this.name,
+            this.top,
+            this.toolboxGroups,
+            width,
+            this._originalGroups,
+            this._standardApperance);
+        if (result.groupsPerRow === this.groupsPerRow) {
+            return result;
+        }
+        return new DisplayedToolbox(this.name, this.top, this.toolboxGroups, width, this._originalGroups);
     }
 
     /**
      * @param {!CustomGateSet} customGateSet
      */
     withCustomGatesInserted(customGateSet) {
-        let groups = [...this._originalGroups];
-        for (let i = 0; i < Math.max(1, customGateSet.gates.length); i += this.groupHeight*2) {
+        let groups = customGateSet.gates.length === 0 ? this._originalGroups : [...this._originalGroups];
+        for (let i = 0; i < customGateSet.gates.length; i += this.groupHeight*2) {
             let group = {
                 hint: 'Custom Gates',
                 gates: [undefined, undefined, undefined, undefined, undefined, undefined]
@@ -94,7 +134,7 @@ class DisplayedToolbox {
             this.name,
             this.top,
             groups,
-            this.labelsOnTop,
+            this.width,
             this._originalGroups,
             this._standardApperance);
     }
@@ -103,17 +143,19 @@ class DisplayedToolbox {
      * @param {!int} groupIndex
      * @param {!int} gateIndex
      * @returns {!Rect}
-     * @private
      */
     gateDrawRect(groupIndex, gateIndex) {
         let dx = gateIndex % 2;
         let dy = Math.floor(gateIndex / 2);
+        let column = groupIndex % this.groupsPerRow;
+        let row = Math.floor(groupIndex / this.groupsPerRow);
 
         let x = Config.TOOLBOX_MARGIN_X +
             dx * Config.TOOLBOX_GATE_SPAN +
-            groupIndex * Config.TOOLBOX_GROUP_SPAN;
+            column * Config.TOOLBOX_GROUP_SPAN;
         let y = this.top +
-            (this.labelsOnTop ? Config.TOOLBOX_MARGIN_Y : 3) +
+            Config.TOOLBOX_MARGIN_Y +
+            row * this._rowHeight() +
             dy * Config.TOOLBOX_GATE_SPAN;
 
         return new Rect(
@@ -126,18 +168,11 @@ class DisplayedToolbox {
     /**
      * @param {!int} groupIndex
      * @returns {!Rect}
-     * @private
      */
     groupLabelRect(groupIndex) {
-        if (this.labelsOnTop) {
-            let r = this.gateDrawRect(groupIndex, 0);
-            let c = new Point(r.x + Config.TOOLBOX_GATE_SPAN - Config.TOOLBOX_GATE_SPACING / 2, r.y - 18);
-            return new Rect(c.x - Config.TOOLBOX_GATE_SPAN, c.y, Config.TOOLBOX_GATE_SPAN * 2, 20);
-        }
-
-        let r = this.gateDrawRect(groupIndex, this.groupHeight*2 - 2);
-        let c = new Point(r.x + Config.TOOLBOX_GATE_SPAN - Config.TOOLBOX_GATE_SPACING / 2, r.bottom());
-        return new Rect(c.x - Config.TOOLBOX_GATE_SPAN, c.y+2, Config.TOOLBOX_GATE_SPAN * 2, 20);
+        let r = this.gateDrawRect(groupIndex, 0);
+        let c = new Point(r.x + Config.TOOLBOX_GATE_SPAN - Config.TOOLBOX_GATE_SPACING / 2, r.y - 18);
+        return new Rect(c.x - Config.TOOLBOX_GATE_SPAN, c.y, Config.TOOLBOX_GATE_SPAN * 2, 20);
     }
 
     /**
@@ -172,7 +207,7 @@ class DisplayedToolbox {
             this.name === other.name &&
             this.top === other.top &&
             this.toolboxGroups === other.toolboxGroups &&
-            this.labelsOnTop === other.labelsOnTop;
+            this.width === other.width;
     }
 
     /**
@@ -184,7 +219,7 @@ class DisplayedToolbox {
             this.name,
             newTop,
             this.toolboxGroups,
-            this.labelsOnTop,
+            this.width,
             this._originalGroups,
             this._standardApperance);
     }
@@ -212,8 +247,8 @@ class DisplayedToolbox {
      * @param {!Painter} painter
      */
     _paintStandardContents(painter) {
-        // Gates.
-        for (let groupIndex = 0; groupIndex < this.toolboxGroups.length; groupIndex++) {
+        // Gates. Custom gates change, so _paintDeviations draws them instead of the cached painting.
+        for (let groupIndex = 0; groupIndex < this._originalGroups.length; groupIndex++) {
             this._paintGatesInGroup(painter, Hand.EMPTY, groupIndex);
         }
 
@@ -348,14 +383,28 @@ class DisplayedToolbox {
      * @returns {!number}
      */
     desiredWidth() {
-        return this.gateDrawRect(this.toolboxGroups.length - 1, 5).right() + 5;
+        return this.gateDrawRect(Math.min(this.groupsPerRow, this.toolboxGroups.length) - 1, 5).right() + 5;
     }
 
-    //noinspection JSMethodCanBeStatic
+    /**
+     * @returns {!number} The width of a single group, which is as narrow as the toolbox wraps.
+     */
+    minimumWidth() {
+        return DisplayedToolbox._rowWidth(1);
+    }
+
     /**
      * @returns {!number}
      */
     desiredHeight() {
+        return Math.ceil(this.toolboxGroups.length / this.groupsPerRow) * this._rowHeight();
+    }
+
+    /**
+     * @returns {!number}
+     * @private
+     */
+    _rowHeight() {
         return (1 + this.groupHeight) * (Config.GATE_RADIUS * 2 + 2) - Config.GATE_RADIUS;
     }
 

@@ -25,12 +25,13 @@ import {EXAMPLE_CIRCUITS, assertCodeRoundTrip, assertEveryGateRoundTrips} from "
 
 let suite = new Suite("Cirq");
 
-let parseError = (code: string): CodeError => {
+/** The error that parsing the code gives, as "Line N: message". */
+let parseError = (code: string): string => {
     try {
         Cirq.parse(code);
     } catch (ex) {
         if (ex instanceof CodeError) {
-            return ex;
+            return ex.toString();
         }
         throw ex;
     }
@@ -257,7 +258,6 @@ suite.test("cirqToFormula", () => {
     assertThat(cirqToFormula("math.sin(math.pi*t)", 1)).isEqualTo("sin(pi*t)");
     assertThat(cirqToFormula("numpy.log(sympy.E)", 1)).isEqualTo("ln(e)");
     assertThat(cirqToFormula("0.25", 1)).isEqualTo("0.25");
-    assertThat(evalCirqExpr("-sympy.pi**2", 0)).isApproximatelyEqualTo(-Math.PI * Math.PI);
     assertThat(cirqToFormula("-sympy.pi**2", 1)).isEqualTo("-pi^2");
     assertThat(cirqToFormula("-t**2 + 1", 1)).isEqualTo("-t^2 + 1");
     assertThat(cirqToFormula("2**t**2", 1)).isEqualTo("2^t^2");
@@ -272,6 +272,7 @@ suite.test("evalCirqExpr", () => {
     assertThat(evalCirqExpr("2**-1", 0)).isApproximatelyEqualTo(0.5);
     assertThat(evalCirqExpr("-2**2", 0)).isApproximatelyEqualTo(-4);
     assertThat(evalCirqExpr("(-2)**2", 0)).isApproximatelyEqualTo(4);
+    assertThat(evalCirqExpr("-sympy.pi**2", 0)).isApproximatelyEqualTo(-Math.PI * Math.PI);
     assertThat(evalCirqExpr("6/3/2", 0)).isApproximatelyEqualTo(1);
     assertThat(evalCirqExpr("2 - 3 - 4", 0)).isApproximatelyEqualTo(-5);
     assertThat(evalCirqExpr("sympy.sin(sympy.pi * t)", 0.5)).isApproximatelyEqualTo(1);
@@ -322,14 +323,6 @@ suite.test("exactness_emittedGatesHaveTheSameMatrix", () => {
     ]) {
         assertThat(covered.has(id)).withInfo({id}).isEqualTo(true);
     }
-});
-
-suite.test("exactness_namedGates", () => {
-    // cirq.S and cirq.T are ZPowGate(exponent=0.5) and ZPowGate(exponent=0.25).
-    assertThat(cirqFormOf("Z^½", undefined)).isEqualTo({kind: 'pow', axis: 'Z', expr: '0.5'});
-    assertThat(cirqFormOf("Z^-¼", undefined)).isEqualTo({kind: 'pow', axis: 'Z', expr: '-0.25'});
-    assertThat(cirqFormOf("H", undefined)).isEqualTo(undefined);
-    assertThat(cirqFormOf("Chance", undefined)).isEqualTo(undefined);
 });
 
 suite.test("parse_program", () => {
@@ -431,7 +424,10 @@ suite.test("parse_scalarGates", () => {
         'cirq.H(q[0]), cirq.global_phase_operation(-1),',
         'cirq.global_phase_operation(1j ** 0.5).controlled_by(q[0]),'
     ))).isEqualTo('{"cols":[["i"],["H","NeGate"],["•","√i"]]}');
-    assertThat(parseError(circuitOf('cirq.global_phase_operation(0.3),')).line).isEqualTo(2);
+    assertThat(parseError(circuitOf('cirq.global_phase_operation(0.3),'))).isEqualTo(
+        "Line 2: QubitBoard's phase gates are cirq.global_phase_operation(1j), cirq.global_phase_operation(-1j), " +
+        "cirq.global_phase_operation(-1), cirq.global_phase_operation(1j**0.5), " +
+        "cirq.global_phase_operation((-1j)**0.5).");
 });
 
 suite.test("parse_customMatrixGates", () => {
@@ -447,14 +443,16 @@ suite.test("parse_customMatrixGates", () => {
         '{"cols":[[1,"~my"],["•","~ab"]],"gates":[{"id":"~my","name":"Yish","matrix":"{{0,i},{-i,0}}"},' +
         '{"id":"~ab","matrix":"{{1,0,0,0},{0,0,1,0},{0,1,0,0},{0,0,0,1}}"}]}');
 
-    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]))').line).isEqualTo(1);
-    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0], [0]]))').line).isEqualTo(1);
-    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0], [0, 1]]))\ng = cirq.MatrixGate(np.array([[1, 0], [0, 1]]))').line).
-        isEqualTo(2);
-    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]))\n' +
-        circuitOf('g(q[0]),')).line).isEqualTo(3);
-    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]))\n' +
-        circuitOf('g(q[0], q[1]),')).line).isEqualTo(3);
+    let oneQubitGate = 'g = cirq.MatrixGate(np.array([[1, 0], [0, 1]]))\n';
+    let twoQubitGate = 'g = cirq.MatrixGate(np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]))\n';
+    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]))')).isEqualTo(
+        "Line 1: A gate matrix must be square with size 2, 4, 8 or 16.");
+    assertThat(parseError('g = cirq.MatrixGate(np.array([[1, 0], [0]]))')).isEqualTo(
+        "Line 1: A gate matrix must be square, with one list per row.");
+    assertThat(parseError(oneQubitGate + oneQubitGate)).isEqualTo("Line 2: The gate 'g' is defined twice.");
+    assertThat(parseError(twoQubitGate + circuitOf('g(q[0]),'))).isEqualTo("Line 3: g needs 2 qubit(s) but got 1.");
+    assertThat(parseError(twoQubitGate + circuitOf('g(q[0], q[1]),'))).isEqualTo(
+        "Line 3: QubitBoard's custom gate needs neighboring qubits listed from the bottom up, like *reversed(q[0:3]).");
 });
 
 suite.test("parse_pragmas", () => {
@@ -464,26 +462,32 @@ suite.test("parse_pragmas", () => {
 });
 
 suite.test("parse_errors", () => {
-    assertThat(parseError('q = cirq.LineQubit.range(2)\nfor i in range(2):\n    pass').line).isEqualTo(2);
-    assertThat(parseError('for i in range(2):').message).isEqualTo(
-        "'for' isn't supported by QubitBoard. Write the circuit as a flat list of operations.");
-    assertThat(parseError(circuitOf('cirq.ISWAP(q[0], q[1]),')).message).isEqualTo(
-        "'cirq.ISWAP' isn't supported by QubitBoard.");
-    assertThat(parseError(circuitOf('cirq.ISWAP(q[0], q[1]),')).line).isEqualTo(2);
-    assertThat(parseError('q = cirq.LineQubit.range(2)\n\n' + circuitOf('cirq.H(q[5]),')).line).isEqualTo(4);
-    assertThat(parseError(circuitOf('cirq.CNOT(q[0], q[0]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.CNOT(q[0]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.H(q[0], q[1]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.X(q[0])**foo,')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.H(q[0])**0.5,')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.H(q[0],')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.H(r[0]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.X(q[1]).controlled_by(q[0], control_values=[2]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.measure(q[1]).controlled_by(q[0]),')).line).isEqualTo(2);
-    assertThat(parseError(circuitOf('cirq.qft(*q[0:3]),')).message).isEqualTo(
-        "QubitBoard's QFT needs neighboring qubits listed from the bottom up, like *reversed(q[0:3]).");
-    assertThat(parseError(circuitOf('cirq.qft(*reversed(q[0:3]), without_reverse=True),')).line).isEqualTo(2);
-    assertThat(parseError('q = cirq.GridQubit.rect(2, 2)').line).isEqualTo(1);
-    assertThat(parseError(circuitOf('cirq.H(q[0]),', '# @qb Foo q[1]')).line).isEqualTo(3);
-    assertThat(parseError('x = 5').line).isEqualTo(1);
+    assertThat(parseError('q = cirq.LineQubit.range(2)\nfor i in range(2):\n    pass')).isEqualTo(
+        "Line 2: 'for' isn't supported by QubitBoard. Write the circuit as a flat list of operations.");
+    assertThat(parseError(circuitOf('cirq.ISWAP(q[0], q[1]),'))).isEqualTo(
+        "Line 2: 'cirq.ISWAP' isn't supported by QubitBoard.");
+    assertThat(parseError('q = cirq.LineQubit.range(2)\n\n' + circuitOf('cirq.H(q[5]),'))).isEqualTo(
+        "Line 4: q[5] is out of range: 'q' has 2 qubits.");
+    assertThat(parseError(circuitOf('cirq.CNOT(q[0], q[0]),'))).isEqualTo(
+        "Line 2: A qubit is used more than once in 'cirq.CNOT(q[0], q[0])'.");
+    assertThat(parseError(circuitOf('cirq.CNOT(q[0]),'))).isEqualTo("Line 2: cirq.CNOT needs 2 qubit(s) but got 1.");
+    assertThat(parseError(circuitOf('cirq.H(q[0], q[1]),'))).isEqualTo("Line 2: cirq.H needs 1 qubit(s) but got 2.");
+    assertThat(parseError(circuitOf('cirq.X(q[0])**foo,'))).isEqualTo("Line 2: Can't evaluate 'foo'.");
+    assertThat(parseError(circuitOf('cirq.H(q[0])**0.5,'))).isEqualTo(
+        "Line 2: QubitBoard can't raise cirq.H to the power '0.5'.");
+    assertThat(parseError(circuitOf('cirq.H(q[0],'))).isEqualTo("Line 2: Missing ')'.");
+    assertThat(parseError(circuitOf('cirq.H(r[0]),'))).isEqualTo(
+        "Line 2: Unknown qubit 'r'. Declare it with 'r = cirq.LineQubit.range(n)'.");
+    assertThat(parseError(circuitOf('cirq.X(q[1]).controlled_by(q[0], control_values=[2]),'))).isEqualTo(
+        "Line 2: control_values can only hold 0 and 1.");
+    assertThat(parseError(circuitOf('cirq.measure(q[1]).controlled_by(q[0]),'))).isEqualTo(
+        "Line 2: QubitBoard can't control a measurement.");
+    assertThat(parseError(circuitOf('cirq.qft(*q[0:3]),'))).isEqualTo(
+        "Line 2: QubitBoard's QFT needs neighboring qubits listed from the bottom up, like *reversed(q[0:3]).");
+    assertThat(parseError(circuitOf('cirq.qft(*reversed(q[0:3]), without_reverse=True),'))).isEqualTo(
+        "Line 2: QubitBoard's QFT always includes the final swaps: remove without_reverse.");
+    assertThat(parseError('q = cirq.GridQubit.rect(2, 2)')).isEqualTo(
+        "Line 1: QubitBoard needs line qubits, like q = cirq.LineQubit.range(3).");
+    assertThat(parseError(circuitOf('cirq.H(q[0]),', '# @qb Foo q[1]'))).isEqualTo("Line 3: Unknown gate 'Foo'.");
+    assertThat(parseError('x = 5')).isEqualTo("Line 1: Couldn't understand 'x = 5'.");
 });

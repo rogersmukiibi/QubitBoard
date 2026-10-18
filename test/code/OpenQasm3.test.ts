@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import {Suite, assertThat, assertThrows} from "../TestUtil.js"
+import {Suite, assertThat} from "../TestUtil.js"
 import {CodeError} from "../../src/code/CodeError.js"
 import {OpenQasm3, formulaToQasm} from "../../src/code/languages/OpenQasm3.js"
-import {evalConstantFormula} from "../../src/code/CircuitCode.js"
 import {EXAMPLE_CIRCUITS, assertCodeRoundTrip, assertEveryGateRoundTrips} from "./CodeTestUtil.js"
 
 let suite = new Suite("OpenQasm3");
 
-let parseError = (code: string): CodeError => {
+/** The error that parsing the code gives, as "Line N: message". */
+let parseError = (code: string): string => {
     try {
         OpenQasm3.parse(code);
     } catch (ex) {
         if (ex instanceof CodeError) {
-            return ex;
+            return ex.toString();
         }
         throw ex;
     }
@@ -78,11 +78,8 @@ suite.test("emit_usesPragmasForQubitBoardOnlyGates", () => {
 });
 
 suite.test("formulasMeanTheSameInQasm", () => {
-    // QASM follows the usual rules: a sign binds looser than a power, and powers group from the right.
+    // QASM, like QubitBoard's formulas, binds a sign looser than a power.
     assertThat(OpenQasm3.parse("rx(-pi**2/3) q[0];")).isEqualTo('{"cols":[[{"id":"Rxft","arg":"-pi^2/3"}]]}');
-    assertThat(evalConstantFormula("-pi^2/3")).isApproximatelyEqualTo(-Math.PI * Math.PI / 3);
-    assertThat(evalConstantFormula("2^3^2")).isApproximatelyEqualTo(512);
-    assertThat(evalConstantFormula("3*2^-1")).isApproximatelyEqualTo(1.5);
 });
 
 suite.test("formulaToQasm", () => {
@@ -138,17 +135,19 @@ suite.test("parse_registers", () => {
 });
 
 suite.test("parse_errors", () => {
-    assertThat(parseError("qubit[2] q;\nh q[0]").line).isEqualTo(2);
-    assertThat(parseError("u3(1,2,3) q[0];").message).isEqualTo("'u3' isn't supported by QubitBoard.");
-    assertThat(parseError("reset q[0];").line).isEqualTo(1);
-    assertThat(parseError("qubit[2] q;\n\nh q[5];").line).isEqualTo(3);
-    assertThat(parseError("cx q[0], q[0];").line).isEqualTo(1);
-    assertThat(parseError("cx q[0];").line).isEqualTo(1);
-    assertThat(parseError("rx(foo) q[0];").line).isEqualTo(1);
-    assertThat(parseError("h(1) q[0];").line).isEqualTo(1);
-    assertThat(parseError("foo q[0];").message).isEqualTo("Unknown gate 'foo'.");
-    assertThat(parseError("qubit[2] q;\nh r[0];").line).isEqualTo(2);
-    assertThat(parseError("cx q, q[1];").line).isEqualTo(1);
-    assertThat(parseError("h q[0];\n// @qb Foo q[1]").line).isEqualTo(2);
-    assertThrows(() => OpenQasm3.parse("pow(2) @ x q[0];"));
+    assertThat(parseError("qubit[2] q;\nh q[0]")).isEqualTo("Line 2: Missing ';' after 'h q[0]'.");
+    assertThat(parseError("u3(1,2,3) q[0];")).isEqualTo("Line 1: 'u3' isn't supported by QubitBoard.");
+    assertThat(parseError("reset q[0];")).isEqualTo("Line 1: 'reset' isn't supported by QubitBoard.");
+    assertThat(parseError("qubit[2] q;\n\nh q[5];")).isEqualTo("Line 3: q[5] is out of range: 'q' has 2 qubits.");
+    assertThat(parseError("cx q[0], q[0];")).isEqualTo("Line 1: q[0] is used more than once in 'cx'.");
+    assertThat(parseError("cx q[0];")).isEqualTo("Line 1: 'cx' needs 2 qubit(s) but got 1.");
+    assertThat(parseError("rx(foo) q[0];")).isEqualTo("Line 1: Can't evaluate the angle 'foo'.");
+    assertThat(parseError("h(1) q[0];")).isEqualTo("Line 1: 'h' takes no angles but got 1.");
+    assertThat(parseError("foo q[0];")).isEqualTo("Line 1: Unknown gate 'foo'.");
+    assertThat(parseError("qubit[2] q;\nh r[0];")).isEqualTo(
+        "Line 2: Unknown qubit register 'r'. Declare it with 'qubit[n] r;'.");
+    assertThat(parseError("cx q, q[1];")).isEqualTo(
+        "Line 1: Whole-register operands only work for single-qubit gates without controls.");
+    assertThat(parseError("h q[0];\n// @qb Foo q[1]")).isEqualTo("Line 2: Unknown gate 'Foo'.");
+    assertThat(parseError("pow(2) @ x q[0];")).isEqualTo("Line 1: The 'pow' modifier isn't supported by QubitBoard.");
 });

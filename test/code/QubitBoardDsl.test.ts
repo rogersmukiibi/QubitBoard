@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-import {Suite, assertThat, assertThrows} from "../TestUtil.js"
+import {Suite, assertThat} from "../TestUtil.js"
 import {CodeError} from "../../src/code/CodeError.js"
 import {Gates} from "../../src/gates/AllGates.js"
 import {QubitBoardDsl} from "../../src/code/languages/QubitBoardDsl.js"
 import {EXAMPLE_CIRCUITS, assertCodeRoundTrip, assertEveryGateRoundTrips} from "./CodeTestUtil.js"
-import {canonicalCircuitJsonText, gateNameOf, findGateByName} from "../../src/code/CircuitCode.js"
+import {gateNameOf, findGateByName} from "../../src/code/CircuitCode.js"
 import {CustomGateSet} from "../../src/circuit/CustomGateSet.js"
 
 let suite = new Suite("QubitBoardDsl");
 
-let parseError = (code: string): CodeError => {
+/** The error that parsing the code gives, as "Line N: message". */
+let parseError = (code: string): string => {
     try {
         QubitBoardDsl.parse(code);
     } catch (ex) {
         if (ex instanceof CodeError) {
-            return ex;
+            return ex.toString();
         }
         throw ex;
     }
@@ -99,29 +100,36 @@ suite.test("emptyColumn", () => {
 
 suite.test("parse_matchesDragAndDropLayout", () => {
     // A gate typed onto a wide gate's second column gets pushed right, exactly like dropping it there would.
-    let typed = QubitBoardDsl.parse("Rzft[pi/2] q0\nH q0");
-    assertThat(typed).isEqualTo(canonicalCircuitJsonText(JSON.parse(typed)));
+    assertThat(QubitBoardDsl.parse("Rzft[sin(pi t)] q0\nH q0")).isEqualTo(
+        '{"cols":[[{"id":"Rzft","arg":"sin(pi t)"}],[],["H"]]}');
+    assertThat(QubitBoardDsl.parse("Rzft[sin(pi t)] q0\nH q1")).isEqualTo(
+        '{"cols":[[{"id":"Rzft","arg":"sin(pi t)"}],[1,"H"]]}');
 });
 
 suite.test("parse_errors", () => {
-    let e = parseError("H q0\nFoo q1");
-    assertThat(e.line).isEqualTo(2);
-    assertThat(e.message).isEqualTo("Unknown gate 'Foo'.");
-
-    assertThat(parseError("H q0, X q0").line).isEqualTo(1);
-    assertThat(parseError("\n\nQFT3 q0, H q2").line).isEqualTo(3);
-    assertThat(parseError("H").message).isEqualTo("'H' needs a qubit, like 'H q0'.");
-    assertThat(parseError("H x0").line).isEqualTo(1);
-    assertThat(parseError("qubits 2\nH q2").line).isEqualTo(2);
-    assertThat(parseError("H q2\nqubits 2").line).isEqualTo(1);
-    assertThat(parseError("H q16").line).isEqualTo(1);
-    assertThat(parseError("H[2] q0").message).isEqualTo("H doesn't take an argument.");
-    assertThat(parseError("setA[70000] q0").line).isEqualTo(1);
-    assertThat(parseError("Rzft[bogus(] q0").line).isEqualTo(1);
-    assertThat(parseError("init q0 = 7").line).isEqualTo(1);
-    assertThat(parseError("~missing q0").line).isEqualTo(1);
-    assertThat(parseError('gate ~a = {"id":"~b","matrix":"{{1,0},{0,1}}"}').line).isEqualTo(1);
-    assertThat(parseError('gate ~a = {"id":"~a","matrix":"{{1,0,0},{0,1,0},{0,0,1}}"}').line).isEqualTo(1);
-    assertThat(parseError("H q0,, X q1").line).isEqualTo(1);
-    assertThrows(() => QubitBoardDsl.parse("Foo q0"));
+    assertThat(parseError("H q0\nFoo q1")).isEqualTo("Line 2: Unknown gate 'Foo'.");
+    assertThat(parseError("H q0, X q0")).isEqualTo(
+        "Line 1: X on q0 overlaps H on q0 in the same column. Put one of them on its own line.");
+    assertThat(parseError("\n\nQFT3 q0, H q2")).isEqualTo(
+        "Line 3: H on q2 overlaps QFT3 on q0 in the same column. Put one of them on its own line.");
+    assertThat(parseError("H")).isEqualTo("Line 1: 'H' needs a qubit, like 'H q0'.");
+    assertThat(parseError("H x0")).isEqualTo("Line 1: Expected a qubit like 'q0' but found 'x0'.");
+    assertThat(parseError("qubits 2\nH q2")).isEqualTo(
+        "Line 2: H on q2 doesn't fit: the circuit has 2 qubits (q0..q1).");
+    assertThat(parseError("H q2\nqubits 2")).isEqualTo(
+        "Line 1: H on q2 doesn't fit: the circuit has 2 qubits (q0..q1).");
+    assertThat(parseError("H q16")).isEqualTo("Line 1: H on q16 doesn't fit: the circuit has 16 qubits (q0..q15).");
+    assertThat(parseError("H[2] q0")).isEqualTo("Line 1: H doesn't take an argument.");
+    assertThat(parseError("setA[70000] q0")).isEqualTo(
+        "Line 1: setA needs a whole number between 0 and 65535, not '70000'.");
+    assertThat(parseError("Rzft[bogus(] q0")).isEqualTo("Line 1: Rzft can't evaluate the formula 'bogus('.");
+    assertThat(parseError("init q0 = 7")).isEqualTo(
+        "Line 1: Unknown initial state '7'. Use one of: 0, 1, +, -, i, -i.");
+    assertThat(parseError("~missing q0")).isEqualTo(
+        "Line 1: Unknown gate '~missing'. Define it first with a 'gate ~missing = {...}' line.");
+    assertThat(parseError('gate ~a = {"id":"~b","matrix":"{{1,0},{0,1}}"}')).isEqualTo(
+        "Line 1: The gate is named '~a' but its JSON has id '~b'.");
+    assertThat(parseError('gate ~a = {"id":"~a","matrix":"{{1,0,0},{0,1,0},{0,0,1}}"}')).isEqualTo(
+        "Line 1: A gate matrix must be square with size 2, 4, 8 or 16.");
+    assertThat(parseError("H q0,, X q1")).isEqualTo("Line 1: Empty gate in the list. Remove the extra comma.");
 });

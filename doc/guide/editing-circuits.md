@@ -41,7 +41,7 @@ Dragging the resize tab up and down will modify the number of qubits the gate ap
 
 In QubitBoard, controlled gates are made up of two parts: the control part and the gate part.
 To make a controlled gate, you just need a control to be in the same column as that gate.
-The basic "qubit must be on" control is in the leftmost group of the top toolbox.
+The basic "qubit must be on" control is in the leftmost group of the toolbox.
 
 ## Qubits
 

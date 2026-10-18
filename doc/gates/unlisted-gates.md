@@ -1,6 +1,6 @@
 # Unlisted gates
 
-QubitBoard has gates that aren't included in the [top](top-toolbox.md) or [bottom](bottom-toolbox.md) toolbox.
+QubitBoard has gates that aren't included in the [toolbox](toolbox.md).
 You can only access these gates by typing their ID, either in the [code panel](../code/index.md) with the [QubitBoard language](../code/qubitboard-language.md) selected (e.g. `+cntA2 q0`) or into the [URL](../reference/circuit-links.md).
 These gates include, but are not limited to:
 

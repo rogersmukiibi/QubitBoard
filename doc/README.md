@@ -10,7 +10,7 @@ The site is built with [VitePress](https://vitepress.dev/) and published next to
 |------|----------|
 | `index.md` | The site's home page |
 | `guide/` | How to use QubitBoard, in reading order |
-| `gates/` | Every gate, with a page per toolbox and a section per toolbox group |
+| `gates/` | Every gate, with a section per toolbox group |
 | `code/` | The code panel and its languages |
 | `reference/` | Pages to look things up in: controls, conventions, circuit links |
 | `images/` | Screenshots used by the pages, and the GIFs used by the repository's README |
@@ -41,7 +41,7 @@ a matrix such as `{{0,1},{1,0}}` as code.
 
 ## Adding or moving a gate
 
-`gates/top-toolbox.md` and `gates/bottom-toolbox.md` mirror the toolboxes defined in `src/gates/AllGates.js`: a `##`
+`gates/toolbox.md` mirrors the toolbox defined in `src/gates/AllGates.js`: a `##`
 section per group, named and ordered like the groups, with a table row for each gate. A row starts with the gate's
 picture and has the gate's id in backticks:
 
@@ -56,5 +56,5 @@ npm run build              # the pictures are taken from out/qubitboard.html
 npm run screenshot-gates   # prints each picture's file name next to its gate id
 ```
 
-`test/doc/ToolboxGatesDoc.test.ts` checks the pages against the toolboxes, so `npm test` fails when the sections don't
-match the groups, a gate has no row, or a row has no picture of its own. Keep other `##` headings off those two pages.
+`test/doc/ToolboxGatesDoc.test.ts` checks the page against the toolbox, so `npm test` fails when the sections don't
+match the groups, a gate has no row, or a row has no picture of its own. Keep other `##` headings off that page.

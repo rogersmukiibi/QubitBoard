@@ -94,8 +94,8 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
   `main`: the app as `index.html`, the documentation under `docs/`.
 - Update the pages in `doc/` when a change affects how QubitBoard is used, and add new pages to the sidebar in
   `doc/.vitepress/config.ts`. `npm run build-docs` fails on a link to a page that doesn't exist.
-- When a gate is added to, removed from or moved within a toolbox in `src/gates/AllGates.js`, update
-  `doc/gates/top-toolbox.md` or `doc/gates/bottom-toolbox.md` to match, and regenerate the gate pictures with
+- When a gate is added to, removed from or moved within the toolbox in `src/gates/AllGates.js`, update
+  `doc/gates/toolbox.md` to match, and regenerate the gate pictures with
   `npm run build && npm run screenshot-gates`. `test/doc/ToolboxGatesDoc.test.ts` fails when a gate has no table row
   or a row has no picture.
 - `.github/workflows/wiki.yml` mirrors `doc/wiki/` into the GitHub wiki on pushes to `main` that change it. The wiki
