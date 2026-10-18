@@ -35,6 +35,9 @@ const launchOptions = process.env.PUPPETEER_NO_SANDBOX ? {args: ['--no-sandbox']
         await page.waitForSelector('#loading-div', {visible: false, timeout: 5 * 1000});
         await page.screenshot({path: 'screenshot.png'});
         await browser.close();
+        if (caughtPageError) {
+            process.exit(1);
+        }
     } catch (ex) {
         console.error("Error bubbled up into PuppeteerSampleCircuit.js: " + ex);
         process.exit(1);

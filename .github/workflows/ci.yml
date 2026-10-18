@@ -26,6 +26,7 @@ jobs:
         cache: npm
     - run: npm ci
     - run: npm run build
+    - run: node PuppeteerCheckApp.mjs
     - run: node PuppeteerScreenshotCircuit.js
     - uses: actions/upload-artifact@v4
       with:

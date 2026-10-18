@@ -24,6 +24,7 @@
     "build-test-perf-page": "node build.mjs test-perf",
     "build-docs": "vitepress build doc",
     "serve-docs": "vitepress dev doc",
+    "check-app": "node build.mjs app && node PuppeteerCheckApp.mjs",
     "screenshot-gates": "node --experimental-strip-types PuppeteerScreenshotGates.mts",
     "typecheck": "tsc -p tsconfig.json",
     "test": "node build.mjs test && node PuppeteerRunTests.js",

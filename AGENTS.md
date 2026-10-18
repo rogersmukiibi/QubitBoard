@@ -60,6 +60,7 @@ npm run build-debug                  # unminified build with a source map, easie
 npm run build-test-page              # build out/test.html
 node PuppeteerRunTests.js            # run all unit tests in headless Chromium (what CI runs)
 npm test                             # the two commands above, in one
+npm run check-app                    # build, then check that the page opens a circuit link and exports a working copy
 node PuppeteerScreenshotCircuit.js   # render a sample circuit to screenshot.png
 npm run test-chrome                  # run unit tests through karma (needs a local Chrome, or CHROME_BIN)
 npm run test-firefox                 # same, with Firefox
@@ -81,6 +82,8 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 - `suite.testUsingWebGL(...)` and `suite.canvasAppearanceTest(...)` depend on the browser. Text metrics and rendering vary
   between Chromium versions and installed fonts, so don't hard-code pixel-exact text positions.
 - Before finishing a change, run `npm test` and confirm that it prints `All N tests passed.` with exit code 0.
+  When the change touches the build, the page template, URL handling or the export dialog, also run
+  `npm run check-app`. The unit tests run from `out/test.html` and never load the production page.
 
 ## CI
 
