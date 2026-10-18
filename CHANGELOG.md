@@ -20,9 +20,14 @@ behave differently is marked **(breaking)**.
 - **Gate reference** in the documentation: every gate in the two toolboxes, with a page per toolbox and a section per
   toolbox group, showing each gate's picture, name, id, sizes and effect. A unit test fails when the pages and the
   toolboxes in `src/gates/AllGates.js` disagree, and `npm run screenshot-gates` retakes the pictures from the app.
+- `?webgl=1` in the page URL, before the `#`, makes QubitBoard use WebGL1. It is for computers where the WebGL2
+  simulation goes wrong. The circuit links page in the documentation describes it.
 
 ### Changed
 
+- **Circuits are simulated with WebGL2** when the browser has it, and with WebGL1 otherwise. The shaders are
+  unchanged, and the simulation was as fast with either version in the performance tests. The unit tests run under
+  both versions.
 - **The user guide is now a documentation site** at <https://rogersmukiibi.com/QubitBoard/docs/>, with a sidebar,
   search and a page per topic in place of the single wiki page. It is built from `doc/` by VitePress
   (`npm run build-docs`) and published next to the app by the Pages workflow. The menu's **User Guide** link opens it,
@@ -31,6 +36,8 @@ behave differently is marked **(breaking)**.
 
 ### Fixed
 
+- The browser console now says when a floating point texture extension is missing. The check compared against
+  `undefined`, but a missing extension is `null`, so the warning never appeared.
 - **Gate tooltips.** Only the text changed; the gates behave as before.
   - The Hadamard gate's tooltip had its two cases the wrong way round. It now says that H maps OFF to OFF + ON and ON
     to OFF - ON.

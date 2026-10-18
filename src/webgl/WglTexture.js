@@ -19,6 +19,7 @@ import {Util} from "../base/Util.js"
 import {WglMortalValueSlot} from "./WglMortalValueSlot.js"
 import {initializedWglContext}  from "./WglContext.js"
 import {checkGetErrorResult, checkFrameBufferStatusResult} from "./WglUtil.js"
+import {floatTextureInternalFormat} from "./WebGlVersion.js"
 
 /**
  * Stores pixel data for/from the gpu.
@@ -171,7 +172,8 @@ class WglTexture {
             gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
             gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
             gl.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-            gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, this.width, this.height, 0, GL.RGBA, this.pixelType, null);
+            let internalFormat = this.pixelType === GL.FLOAT ? floatTextureInternalFormat(gl) : GL.RGBA;
+            gl.texImage2D(GL.TEXTURE_2D, 0, internalFormat, this.width, this.height, 0, GL.RGBA, this.pixelType, null);
             checkGetErrorResult(gl, "texImage2D");
             gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, result.texture, 0);
             checkGetErrorResult(gl, "framebufferTexture2D");

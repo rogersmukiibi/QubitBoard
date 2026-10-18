@@ -19,6 +19,9 @@ const puppeteer = require('puppeteer');
 // Set PUPPETEER_NO_SANDBOX=1 when running inside a container that can't use Chromium's sandbox.
 const launchOptions = process.env.PUPPETEER_NO_SANDBOX ? {args: ['--no-sandbox']} : {};
 
+// Pass --webgl1 to run the tests on a WebGL1 context, the fallback for browsers without WebGL2.
+const query = process.argv.includes('--webgl1') ? '?webgl=1' : '';
+
 // If the browser dies mid-run, the awaits below never settle and node would otherwise exit 0
 // with no tests having run. Treat any exit that didn't reach the end of the run as a failure.
 let reachedEndOfRun = false;
@@ -48,13 +51,17 @@ process.on('exit', code => {
         });
 
         const outDirUrl = 'file:///' + __dirname.split('\\').join('/') + '/out/';
-        await page.goto(outDirUrl + 'test.html#blocking');
+        await page.goto(outDirUrl + 'test.html' + query);
         await page.waitForSelector('#done', {timeout: 5 * 60 * 1000});
-        let {total, done, anyFailures} = await page.evaluate(() => ({
-            total: __total_tests,
-            done: __total_done,
-            anyFailures: __any_failures
-        }));
+        let {total, done, anyFailures, webGl} = await page.evaluate(() => {
+            let gl = document.createElement('canvas').getContext(location.search === '?webgl=1' ? 'webgl' : 'webgl2');
+            return {
+                total: __total_tests,
+                done: __total_done,
+                anyFailures: __any_failures,
+                webGl: gl === null ? 'no WebGL' : gl instanceof WebGLRenderingContext ? 'WebGL1' : 'WebGL2'
+            };
+        });
 
         reachedEndOfRun = true;
         await browser.close();
@@ -67,7 +74,7 @@ process.on('exit', code => {
         if (anyFailures || caughtPageError) {
             process.exit(1);
         }
-        console.log(`All ${total} tests passed.`);
+        console.log(`All ${total} tests passed (${webGl}).`);
     } catch (ex) {
         console.error("Error bubbled up into PuppeteerRunTests.js: " + ex);
         process.exit(1);

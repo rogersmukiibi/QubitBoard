@@ -15,10 +15,12 @@
  */
 
 import {notifyAboutKnownIssue} from "./fallback.js"
+import {createWebGlContext, maxWebGlVersion} from "./webgl/WebGlVersion.js"
 
 let canvasCreatedForTesting = document.createElement('canvas');
-let webglContextCreatedForTesting = canvasCreatedForTesting.getContext('webgl') ||
-    canvasCreatedForTesting.getContext('experimental-webgl');
+let webglContextCreatedForTesting = createWebGlContext(
+    canvasCreatedForTesting,
+    maxWebGlVersion(document.location.search));
 
 /** @returns {!boolean} */
 function detectWebGlNotSupported() {

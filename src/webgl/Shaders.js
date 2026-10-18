@@ -19,6 +19,7 @@ import {WglArg} from "./WglArg.js"
 import {initializedWglContext} from "./WglContext.js"
 import {WglShader} from "./WglShader.js"
 import {WglConfiguredShader} from "./WglConfiguredShader.js"
+import {floatTextureInternalFormat} from "./WebGlVersion.js"
 import {
     currentShaderCoder,
     Inputs,
@@ -79,6 +80,7 @@ Shaders.data = rgbaData => new WglConfiguredShader(destinationTexture => {
 
     let GL = WebGLRenderingContext;
     let gl = initializedWglContext().gl;
+    let isBytes = rgbaData instanceof Uint8Array;
     let dataTexture = gl.createTexture();
     try {
         gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, dataTexture);
@@ -87,12 +89,12 @@ Shaders.data = rgbaData => new WglConfiguredShader(destinationTexture => {
         gl.texImage2D(
             GL.TEXTURE_2D,
             0,
-            GL.RGBA,
+            isBytes ? GL.RGBA : floatTextureInternalFormat(gl),
             w,
             h,
             0,
             GL.RGBA,
-            rgbaData instanceof Uint8Array ? GL.UNSIGNED_BYTE : GL.FLOAT,
+            isBytes ? GL.UNSIGNED_BYTE : GL.FLOAT,
             rgbaData);
         PASSTHROUGH_SHADER.withArgs(
             WglArg.vec2("textureSize", w, h),

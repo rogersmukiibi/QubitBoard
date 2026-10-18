@@ -15,15 +15,16 @@
  */
 
 import {canvasCreatedForTesting, webglContextCreatedForTesting} from "../issues.js"
+import {createWebGlContext, enableFloatTextureExtensions, isWebGl2, maxWebGlVersion} from "./WebGlVersion.js"
 
 /**
- * A WebGLRenderingContext wrapped with metadata helpers, lifetime information, and utility methods.
+ * A WebGL1 or WebGL2 rendering context wrapped with metadata helpers, lifetime information, and utility methods.
  */
 class WglContext {
     /**
-     * Creates and wraps a WebGLRenderingContext.
-     * @param {!HTMLCanvasElement} canvas
-     * @param {!WebGLRenderingContext} context
+     * Creates and wraps a rendering context.
+     * @param {!HTMLCanvasElement=} canvas
+     * @param {null|!WebGLRenderingContext|!WebGL2RenderingContext=} context
      */
     constructor(canvas=undefined, context=undefined) {
         if (canvas === undefined) {
@@ -31,7 +32,7 @@ class WglContext {
             context = undefined;
         }
         if (context === undefined) {
-            context = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            context = createWebGlContext(canvas, maxWebGlVersion(document.location.search));
         }
 
         /**
@@ -41,21 +42,21 @@ class WglContext {
         this.canvas = canvas;
 
         /**
-         * The WebGLRenderingContext instance associated with the WglContext.
-         * @type {!WebGLRenderingContext}
+         * The rendering context associated with the WglContext.
+         * @type {!WebGLRenderingContext|!WebGL2RenderingContext}
          */
         this.gl = context;
 
-        if ((/** @type {null|!WebGLRenderingContext} */ this.gl) === null) {
+        if ((/** @type {null|!WebGLRenderingContext|!WebGL2RenderingContext} */ this.gl) === null) {
             throw new Error('Error creating WebGL context.');
         }
-        if (this.gl.getExtension('OES_texture_float') === undefined) {
+
+        /** @type {!int} */
+        this.webGlVersion = isWebGl2(this.gl) ? 2 : 1;
+
+        for (let name of enableFloatTextureExtensions(this.gl)) {
             // We'll just fall back to using byte coding of intermediate values.
-            console.warn("OES_texture_float webgl extension not present.");
-        }
-        if (this.gl.getExtension('WEBGL_color_buffer_float') === undefined) {
-            // We'll just fall back to using byte coding of intermediate values.
-            console.warn("WEBGL_color_buffer_float webgl extension not present.");
+            console.warn(`${name} webgl extension not present.`);
         }
 
         /** @type {!function():void} */

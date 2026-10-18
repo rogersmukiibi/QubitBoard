@@ -27,7 +27,7 @@
     "check-app": "node build.mjs app && node PuppeteerCheckApp.mjs",
     "screenshot-gates": "node --experimental-strip-types PuppeteerScreenshotGates.mts",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "node build.mjs test && node PuppeteerRunTests.js",
+    "test": "node build.mjs test && node PuppeteerRunTests.js && node PuppeteerRunTests.js --webgl1",
     "test-chrome": "node build.mjs test && karma start karma.test.conf.js --browsers Chrome",
     "test-firefox": "node build.mjs test && karma start karma.test.conf.js --browsers Firefox",
     "test-perf-chrome": "node build.mjs test-perf && karma start karma.test_perf.conf.js --browsers Chrome"

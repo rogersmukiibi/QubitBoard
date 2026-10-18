@@ -19,6 +19,14 @@ You can do this slowly with a lot of mouse dragging, or quickly by copying the U
 The [code panel](../code/index.md) is usually an easier way to make this kind of edit.
 With the [QubitBoard language](../code/qubitboard-language.md) selected, it shows the same gate ids one column per line and applies your changes when you press Ctrl+Enter.
 
+## Using WebGL1
+
+QubitBoard simulates circuits on your graphics card, with WebGL2, or with WebGL1 in browsers that don't have WebGL2.
+If the displays look wrong on your computer, add `?webgl=1` before the `#` to make QubitBoard use WebGL1, for example
+`https://rogersmukiibi.com/QubitBoard/?webgl=1#circuit={"cols":[["H"]]}`.
+Editing the circuit keeps the option in the URL.
+If WebGL1 fixes the problem, please [report it](https://github.com/rogersmukiibi/QubitBoard/issues) with your browser and graphics card.
+
 ## Custom gates
 
 To delete or edit a custom gate, change or remove its definition line in the code panel (along with any lines that use it), or edit the `gates` list in the URL.

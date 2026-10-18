@@ -58,8 +58,9 @@ npm run typecheck                    # type-check the TypeScript files
 npm run build                        # production build -> out/qubitboard.html
 npm run build-debug                  # unminified build with a source map, easier to debug
 npm run build-test-page              # build out/test.html
-node PuppeteerRunTests.js            # run all unit tests in headless Chromium (what CI runs)
-npm test                             # the two commands above, in one
+node PuppeteerRunTests.js            # run all unit tests in headless Chromium, on WebGL2 (what CI runs)
+node PuppeteerRunTests.js --webgl1   # the same on WebGL1, the fallback for browsers without WebGL2 (CI runs it too)
+npm test                             # build the test page and run both, in one
 npm run check-app                    # build, then check that the page opens a circuit link and exports a working copy
 node PuppeteerScreenshotCircuit.js   # render a sample circuit to screenshot.png
 npm run test-chrome                  # run unit tests through karma (needs a local Chrome, or CHROME_BIN)

@@ -40,6 +40,19 @@ Each of these gates currently stays on a `# @qb` comment line. They are listed i
 - **Developer documentation on the site.** Building, the TypeScript migration and deployment are still described in
   `README.md` and `AGENTS.md` only.
 
+### Simulator
+
+- **More than 16 qubits: measure on a real GPU first.** See the 2026-10-18 decision below for the software-rendering
+  numbers. With `Config.MAX_WIRE_COUNT` set to 20, every unit test passes except `QubitBoardDsl parse_errors`, which
+  expects `q16` to be out of range, but no test uses a circuit wider than 16 wires. What raising it involves:
+  - The constant is unrolled into shader loops (`CircuitShaders.js` and the arithmetic gates) that always run
+    `MAX_WIRE_COUNT` times, so raising it slows every circuit. Giving the loops a `break` at the circuit's real wire
+    count would avoid that.
+  - Shader index arithmetic uses floats, so it is exact up to 2^24 amplitudes, and the measurement masks are 32-bit
+    integers.
+  - Older QubitBoard versions and Quirk open a wider circuit with 16 wires and silently drop the gates on the others.
+  - Add perf goals for the wider circuits next to the 16-qubit ones in `test_perf/`.
+
 ### Tooling
 
 - **Replace or remove karma.** It is deprecated, and its dependencies (`braces`, through `chokidar`) are the three
@@ -49,6 +62,10 @@ Each of these gates currently stays on a `# @qb` comment line. They are listed i
   it as a separate file published next to `index.html`.
 
 ## Known issues
+
+- `npm run screenshot-gates` fails with `ERR_NO_TYPESCRIPT` on Node builds compiled without TypeScript support, such
+  as Ubuntu's `nodejs` 22.22. It runs `PuppeteerScreenshotGates.mts` with `--experimental-strip-types`. Writing it as
+  `.mjs`, like `PuppeteerCheckApp.mjs`, would remove the dependency.
 
 - `sqrt` of a negated real number picks the lower branch: the formula `sqrt -4` gives -2i, not 2i. Negating a real
   number leaves it with an imaginary part of -0, which the square root reads as an angle of -180°.
@@ -68,5 +85,11 @@ QubitBoard language is kept.
   changelog for what this changes in old links.
 - **2026-10-12: Qiskit is not planned for now.** It is the most widely used framework, but a poor match for the gate
   set: fractional powers become opaque unitaries, and there are no columns.
+- **2026-10-18: The qubit limit stays at 16 until it is measured on a GPU.** In headless Chromium's software renderer
+  (SwiftShader), one simulation of a QFT circuit like the `test_perf` ones took about 0.6 s at 16 qubits, 1.4 s at 18
+  and 6.2 s at 20, against the 75 ms goal at 16 qubits. Painting took 0.1-0.3 s. Raising the limit to 20 made the
+  16-qubit perf tests about 10-20% slower. A GPU could change the picture, but none was available to measure.
+- **2026-10-18: WebGL2 is used when the browser has it,** with WebGL1 as the fallback and `?webgl=1` to force it. The
+  perf tests ran as fast on either version, and the unit tests run on both.
 - **Exactness over coverage.** A gate is written in an external language only when the matrices are identical,
   including global phase, and the line reads back as the same column. Otherwise it stays a `@qb` comment.
