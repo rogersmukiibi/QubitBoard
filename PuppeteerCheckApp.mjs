@@ -107,7 +107,11 @@ const main = async () => {
     const downloadDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qubitboard-check-'));
 
     // Set PUPPETEER_NO_SANDBOX=1 when running inside a container that can't use Chromium's sandbox.
-    const browser = await puppeteer.launch(process.env.PUPPETEER_NO_SANDBOX ? {args: ['--no-sandbox']} : {});
+    // Without a UTF-8 locale, Chromium saves a download whose name has a character like "•" as "download".
+    const browser = await puppeteer.launch({
+        args: process.env.PUPPETEER_NO_SANDBOX ? ['--no-sandbox'] : [],
+        env: {LANG: 'C.UTF-8', ...process.env}
+    });
     try {
         const url = pathToFileURL(pagePath);
         url.hash = 'circuit=' + JSON.stringify(CIRCUIT);

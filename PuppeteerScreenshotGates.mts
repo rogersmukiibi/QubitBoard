@@ -48,15 +48,14 @@ const LAYOUT_SCRIPT = `
     globalThis.toolboxGates = (width, height) => {
         let inspector = DisplayedInspector.empty(new Rect(0, 0, width, height));
         let result = [];
-        for (let toolbox of [inspector.displayedToolboxTop, inspector.displayedToolboxBottom]) {
-            toolbox.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
-                if (gate !== undefined) {
-                    let r = toolbox.gateDrawRect(groupIndex, gateIndex);
-                    let id = gate.serializedId;
-                    result.push({id, name: gateNameOf(id), x: r.x, y: r.y, w: r.w, h: r.h});
-                }
-            }));
-        }
+        let toolbox = inspector.displayedToolbox;
+        toolbox.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
+            if (gate !== undefined) {
+                let r = toolbox.gateDrawRect(groupIndex, gateIndex);
+                let id = gate.serializedId;
+                result.push({id, name: gateNameOf(id), x: r.x, y: r.y, w: r.w, h: r.h});
+            }
+        }));
         return result;
     };
 `;

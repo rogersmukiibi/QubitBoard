@@ -18,7 +18,7 @@ hero:
 
 features:
   - title: Drag and drop
-    details: Build a circuit by dragging gates out of the toolboxes and onto the wires. There is nothing to install or configure.
+    details: Build a circuit by dragging gates out of the toolbox and onto the wires. There is nothing to install or configure.
     link: /guide/editing-circuits
   - title: Inline state displays
     details: Put chance, amplitude, Bloch sphere and density matrix displays anywhere in the circuit to see the state at that point.

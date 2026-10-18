@@ -16,8 +16,7 @@
 
 import {Suite, assertThat} from "../TestUtil.js"
 import {Gates} from "../../src/gates/AllGates.js"
-import topToolboxPage from "../../doc/gates/top-toolbox.md"
-import bottomToolboxPage from "../../doc/gates/bottom-toolbox.md"
+import toolboxPage from "../../doc/gates/toolbox.md"
 
 let suite = new Suite("ToolboxGatesDoc");
 
@@ -72,27 +71,16 @@ function gatePictures(page: string, groups: ToolboxGroup[]): string[] {
     return pictures;
 }
 
-suite.test("topToolboxPageHasASectionPerGroupInToolboxOrder", () => {
-    assertThat(sectionsOf(topToolboxPage).map(e => e[0])).isEqualTo(Gates.TopToolboxGroups.map(e => e.hint));
+suite.test("toolboxPageHasASectionPerGroupInToolboxOrder", () => {
+    assertThat(sectionsOf(toolboxPage).map(e => e[0])).isEqualTo(Gates.ToolboxGroups.map(e => e.hint));
 });
 
-suite.test("bottomToolboxPageHasASectionPerGroupInToolboxOrder", () => {
-    assertThat(sectionsOf(bottomToolboxPage).map(e => e[0])).isEqualTo(Gates.BottomToolboxGroups.map(e => e.hint));
-});
-
-suite.test("topToolboxPageNamesEveryGate", () => {
-    assertThat(undocumentedGates(topToolboxPage, Gates.TopToolboxGroups)).isEqualTo([]);
-});
-
-suite.test("bottomToolboxPageNamesEveryGate", () => {
-    assertThat(undocumentedGates(bottomToolboxPage, Gates.BottomToolboxGroups)).isEqualTo([]);
+suite.test("toolboxPageNamesEveryGate", () => {
+    assertThat(undocumentedGates(toolboxPage, Gates.ToolboxGroups)).isEqualTo([]);
 });
 
 suite.test("everyGateRowStartsWithItsOwnPicture", () => {
-    let pictures = [
-        ...gatePictures(topToolboxPage, Gates.TopToolboxGroups),
-        ...gatePictures(bottomToolboxPage, Gates.BottomToolboxGroups)
-    ];
+    let pictures = gatePictures(toolboxPage, Gates.ToolboxGroups);
     assertThat(pictures.filter(picture => picture.endsWith('has no picture'))).isEqualTo([]);
     assertThat(pictures.filter((picture, index) => pictures.indexOf(picture) !== index)).isEqualTo([]);
 });

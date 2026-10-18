@@ -77,8 +77,7 @@ export default defineConfig({
                 text: 'Gates',
                 items: [
                     {text: 'Overview', link: '/gates/'},
-                    {text: 'Top toolbox', link: '/gates/top-toolbox'},
-                    {text: 'Bottom toolbox', link: '/gates/bottom-toolbox'},
+                    {text: 'Toolbox', link: '/gates/toolbox'},
                     {text: 'Unlisted gates', link: '/gates/unlisted-gates'}
                 ]
             },

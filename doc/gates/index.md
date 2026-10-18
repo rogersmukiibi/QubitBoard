@@ -1,43 +1,34 @@
 # Gates
 
-QubitBoard's gates live in two toolboxes, one above the circuit and one below it.
-Each toolbox is divided into named groups.
-These pages follow the same layout: one page per toolbox, with one section per group, in the order the groups appear on screen.
+QubitBoard's gates live in the toolbox above the circuit, which is divided into named groups.
+The groups run from left to right and wrap onto another row when the window is too narrow to show them all.
+The [Toolbox](toolbox.md) page has one section per group, in the order the groups appear on screen.
 
-## The top toolbox
-
-![The top toolbox](../images/top-toolbox.png)
+![The toolbox](../images/toolbox.png)
 
 | Group | What's in it |
 |-------|--------------|
-| [Probes](top-toolbox.md#probes) | Measurement, postselection and controls |
-| [Displays](top-toolbox.md#displays) | Density matrix, Bloch sphere, chance and amplitude displays |
-| [Half Turns](top-toolbox.md#half-turns) | The Pauli gates, Hadamard and Swap |
-| [Quarter Turns](top-toolbox.md#quarter-turns) | Square roots of the Pauli gates, such as S |
-| [Eighth Turns](top-toolbox.md#eighth-turns) | Fourth roots of the Pauli gates, such as T |
-| [Spinning](top-toolbox.md#spinning) | Rotations that turn continuously as time passes |
-| [Formulaic](top-toolbox.md#formulaic) | Rotations by a formula that you type |
-| [Parametrized](top-toolbox.md#parametrized) | Rotations by an amount read from other qubits |
-| [Sampling](top-toolbox.md#sampling) | Detectors, which measure by sampling |
-| [Parity](top-toolbox.md#parity) | Controls on the parity of several qubits |
+| [Probes](toolbox.md#probes) | Measurement, postselection and controls |
+| [Displays](toolbox.md#displays) | Density matrix, Bloch sphere, chance and amplitude displays |
+| [Half Turns](toolbox.md#half-turns) | The Pauli gates, Hadamard and Swap |
+| [Quarter Turns](toolbox.md#quarter-turns) | Square roots of the Pauli gates, such as S |
+| [Eighth Turns](toolbox.md#eighth-turns) | Fourth roots of the Pauli gates, such as T |
+| [Spinning](toolbox.md#spinning) | Rotations that turn continuously as time passes |
+| [Formulaic](toolbox.md#formulaic) | Rotations by a formula that you type |
+| [Parametrized](toolbox.md#parametrized) | Rotations by an amount read from other qubits |
+| [Sampling](toolbox.md#sampling) | Detectors, which measure by sampling |
+| [Parity](toolbox.md#parity) | Controls on the parity of several qubits |
+| [X/Y Probes](toolbox.md#x-y-probes) | Controls and postselection along the X and Y axes |
+| [Order](toolbox.md#order) | Counting gates and gates that re-order qubits |
+| [Frequency](toolbox.md#frequency) | Fourier transforms and phase gradients |
+| [Inputs](toolbox.md#inputs) | Gates that supply the values A, B and R to other gates |
+| [Arithmetic](toolbox.md#arithmetic) | Increment, add and multiply |
+| [Compare](toolbox.md#compare) | Toggle a qubit by comparing two inputs |
+| [Modular](toolbox.md#modular) | Arithmetic modulo the input R |
+| [Scalar](toolbox.md#scalar) | Global phases and the spacer |
 
-## The bottom toolbox
-
-![The bottom toolbox](../images/bottom-toolbox.png)
-
-| Group | What's in it |
-|-------|--------------|
-| [X/Y Probes](bottom-toolbox.md#x-y-probes) | Controls and postselection along the X and Y axes |
-| [Order](bottom-toolbox.md#order) | Counting gates and gates that re-order qubits |
-| [Frequency](bottom-toolbox.md#frequency) | Fourier transforms and phase gradients |
-| [Inputs](bottom-toolbox.md#inputs) | Gates that supply the values A, B and R to other gates |
-| [Arithmetic](bottom-toolbox.md#arithmetic) | Increment, add and multiply |
-| [Compare](bottom-toolbox.md#compare) | Toggle a qubit by comparing two inputs |
-| [Modular](bottom-toolbox.md#modular) | Arithmetic modulo the input R |
-| [Scalar](bottom-toolbox.md#scalar) | Global phases and the spacer |
-
-Gates that you make with **Make Gate** appear in a **Custom Gates** group at the end of the bottom toolbox.
-QubitBoard also has gates that aren't in either toolbox: see [Unlisted gates](unlisted-gates.md).
+Gates that you make with **Make Gate** appear in a **Custom Gates** group at the end of the toolbox.
+QubitBoard also has gates that aren't in the toolbox: see [Unlisted gates](unlisted-gates.md).
 
 ## Reading the tables
 
@@ -70,9 +61,9 @@ This works for displays too. See [Conditioning displays](../guide/displays.md#co
 
 Some gates change as time passes, which makes the circuit animate.
 Time is a variable `t` that starts at -1, grows to +1, then jumps back to -1.
-The [Spinning](top-toolbox.md#spinning) gates, the [Formulaic](top-toolbox.md#formulaic) gates, the counting gates in [Order](bottom-toolbox.md#order) and the cycling gradients in [Frequency](bottom-toolbox.md#frequency) depend on it.
+The [Spinning](toolbox.md#spinning) gates, the [Formulaic](toolbox.md#formulaic) gates, the counting gates in [Order](toolbox.md#order) and the cycling gradients in [Frequency](toolbox.md#frequency) depend on it.
 
 ### Inputs
 
 Gates with an A, B or R in their label read that value from other qubits.
-Put an input gate from the [Inputs](bottom-toolbox.md#inputs) group in the same column, or set a default value earlier in the circuit.
+Put an input gate from the [Inputs](toolbox.md#inputs) group in the same column, or set a default value earlier in the circuit.

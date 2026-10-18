@@ -31,17 +31,14 @@ class DisplayedInspector {
     /**
      * @param {!Rect} drawArea
      * @param {!DisplayedCircuit} circuitWidget
-     * @param {!DisplayedToolbox} displayedToolboxTop
-     * @param {!DisplayedToolbox} displayedToolboxBottom
+     * @param {!DisplayedToolbox} displayedToolbox
      * @param {!Hand} hand
      */
-    constructor(drawArea, circuitWidget, displayedToolboxTop, displayedToolboxBottom, hand) {
+    constructor(drawArea, circuitWidget, displayedToolbox, hand) {
         /** @type {!DisplayedCircuit} */
         this.displayedCircuit = circuitWidget;
         /** @type {!DisplayedToolbox} */
-        this.displayedToolboxTop = displayedToolboxTop;
-        /** @type {!DisplayedToolbox} */
-        this.displayedToolboxBottom = displayedToolboxBottom.
+        this.displayedToolbox = displayedToolbox.
             withCustomGatesInserted(circuitWidget.circuitDefinition.customGateSet);
         /** @type {!Hand} */
         this.hand = hand;
@@ -52,11 +49,7 @@ class DisplayedInspector {
     }
 
     desiredWidth() {
-        return Math.max(
-            this.displayedToolboxTop.desiredWidth(),
-            Math.max(
-                this.displayedCircuit.desiredWidth(),
-                this.displayedToolboxBottom.desiredWidth()));
+        return Math.max(this.displayedToolbox.minimumWidth(), this.displayedCircuit.desiredWidth());
     }
 
     /**
@@ -65,9 +58,8 @@ class DisplayedInspector {
     updateArea(drawArea) {
         this.drawArea = drawArea;
 
-        this.displayedToolboxTop = this.displayedToolboxTop.withTop(0);
-        this.displayedToolboxBottom = this.displayedToolboxBottom.withTop(
-            this.drawArea.bottom() - this.displayedToolboxBottom.desiredHeight());
+        this.displayedToolbox = this.displayedToolbox.withTop(0).withWidth(drawArea.w);
+        this.displayedCircuit = this.displayedCircuit.withTop(this.displayedToolbox.desiredHeight());
     }
 
     /**
@@ -75,18 +67,11 @@ class DisplayedInspector {
      * @returns {!DisplayedInspector}
      */
     static empty(drawArea) {
-        let topToolbox = new DisplayedToolbox('Toolbox', 0, Gates.TopToolboxGroups, true);
-        let displayedCircuit = DisplayedCircuit.empty(topToolbox.desiredHeight());
-        let bottomToolbox = new DisplayedToolbox(
-            'Toolbox₂',
-            displayedCircuit.top + displayedCircuit.desiredHeight(),
-            Gates.BottomToolboxGroups,
-            false);
+        let toolbox = new DisplayedToolbox('Toolbox', 0, Gates.ToolboxGroups, drawArea.w);
         return new DisplayedInspector(
             drawArea,
-            displayedCircuit,
-            topToolbox,
-            bottomToolbox,
+            DisplayedCircuit.empty(toolbox.desiredHeight()),
+            toolbox,
             Hand.EMPTY);
     }
 
@@ -97,8 +82,7 @@ class DisplayedInspector {
     paint(painter, stats) {
         painter.fillRect(this.drawArea, Config.BACKGROUND_COLOR);
 
-        this.displayedToolboxTop.paint(painter, stats, this.hand);
-        this.displayedToolboxBottom.paint(painter, stats, this.hand);
+        this.displayedToolbox.paint(painter, stats, this.hand);
         this.displayedCircuit.paint(painter, this.hand, stats);
         this._paintHand(painter, stats);
         this._drawHint(painter);
@@ -174,8 +158,7 @@ class DisplayedInspector {
         let hand = this.hand;
         let circuit = this.displayedCircuit;
 
-        hand = this.displayedToolboxTop.tryGrab(hand);
-        hand = this.displayedToolboxBottom.tryGrab(hand);
+        hand = this.displayedToolbox.tryGrab(hand);
         let obj = circuit.tryGrab(hand, duplicate, wholeCol, ignoreResizeTabs, alt);
         hand = obj.newHand;
         circuit = obj.newCircuit;
@@ -183,8 +166,7 @@ class DisplayedInspector {
         return new DisplayedInspector(
             this.drawArea,
             circuit,
-            this.displayedToolboxTop,
-            this.displayedToolboxBottom,
+            this.displayedToolbox,
             hand);
     }
 
@@ -200,8 +182,7 @@ class DisplayedInspector {
         return other instanceof DisplayedInspector &&
             this.drawArea.isEqualTo(other.drawArea) &&
             this.displayedCircuit.isEqualTo(other.displayedCircuit) &&
-            this.displayedToolboxTop.isEqualTo(other.displayedToolboxTop) &&
-            this.displayedToolboxBottom.isEqualTo(other.displayedToolboxBottom) &&
+            this.displayedToolbox.isEqualTo(other.displayedToolbox) &&
             this.hand.isEqualTo(other.hand);
     }
 
@@ -216,8 +197,7 @@ class DisplayedInspector {
         return new DisplayedInspector(
             this.drawArea,
             displayedCircuit,
-            this.displayedToolboxTop,
-            this.displayedToolboxBottom,
+            this.displayedToolbox,
             this.hand);
     }
 
@@ -266,8 +246,7 @@ class DisplayedInspector {
      */
     stableDuration() {
         return Math.min(
-            this.displayedToolboxTop.stableDuration(this.hand),
-            this.displayedToolboxBottom.stableDuration(this.hand),
+            this.displayedToolbox.stableDuration(this.hand),
             this.hand.stableDuration(),
             this.displayedCircuit.stableDuration());
     }
@@ -280,8 +259,7 @@ class DisplayedInspector {
         return new DisplayedInspector(
             this.drawArea,
             this.displayedCircuit,
-            this.displayedToolboxTop,
-            this.displayedToolboxBottom,
+            this.displayedToolbox,
             hand);
     }
 
@@ -292,9 +270,8 @@ class DisplayedInspector {
     withCircuitDefinition(newCircuitDefinition) {
         return new DisplayedInspector(
             this.drawArea,
-            DisplayedCircuit.empty(this.displayedToolboxTop.desiredHeight()).withCircuit(newCircuitDefinition),
-            this.displayedToolboxTop,
-            this.displayedToolboxBottom,
+            DisplayedCircuit.empty(this.displayedToolbox.desiredHeight()).withCircuit(newCircuitDefinition),
+            this.displayedToolbox,
             this.hand.withDrop());
     }
 
@@ -302,10 +279,7 @@ class DisplayedInspector {
      * @returns {!number}
      */
     desiredHeight() {
-        let minimumDesired =
-            this.displayedToolboxBottom.desiredHeight() +
-            this.displayedToolboxTop.desiredHeight() +
-            this.displayedCircuit.desiredHeight();
+        let minimumDesired = this.displayedToolbox.desiredHeight() + this.displayedCircuit.desiredHeight();
         return Math.max(Config.MINIMUM_CANVAS_HEIGHT, minimumDesired);
     }
 

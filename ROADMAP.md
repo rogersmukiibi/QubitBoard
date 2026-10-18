@@ -88,7 +88,9 @@ QubitBoard language is kept.
 - **2026-10-18: The qubit limit stays at 16 until it is measured on a GPU.** In headless Chromium's software renderer
   (SwiftShader), one simulation of a QFT circuit like the `test_perf` ones took about 0.6 s at 16 qubits, 1.4 s at 18
   and 6.2 s at 20, against the 75 ms goal at 16 qubits. Painting took 0.1-0.3 s. Raising the limit to 20 made the
-  16-qubit perf tests about 10-20% slower. A GPU could change the picture, but none was available to measure.
+  16-qubit perf tests about 10-20% slower. Mesa's llvmpipe, a faster software renderer, took 50 ms at 16 qubits,
+  0.2 s at 18 and 0.9 s at 20, and the limit of 20 cost it only about 2.5% at 16 qubits. A GPU could change the
+  picture, but none was available to measure.
 - **2026-10-18: WebGL2 is used when the browser has it,** with WebGL1 as the fallback and `?webgl=1` to force it. The
   perf tests ran as fast on either version, and the unit tests run on both.
 - **Exactness over coverage.** A gate is written in an external language only when the matrices are identical,

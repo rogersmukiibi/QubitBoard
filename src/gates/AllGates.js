@@ -188,7 +188,7 @@ Gates.findKnownGateById = (id, customGateSet) => {
 };
 
 /** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
-Gates.TopToolboxGroups = [
+Gates.ToolboxGroups = [
     {
         hint: "Probes",
         gates: [
@@ -269,10 +269,6 @@ Gates.TopToolboxGroups = [
             Controls.XParityControl, undefined,
         ]
     },
-];
-
-/** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
-Gates.BottomToolboxGroups = [
     {
         hint: "X/Y Probes",
         gates: [
