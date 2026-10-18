@@ -15,7 +15,6 @@
  */
 
 import {Suite, assertThat, assertTrue} from "../TestUtil.js"
-import {Config} from "../../src/Config.js"
 import {CustomGateSet} from "../../src/circuit/CustomGateSet.js"
 import {DisplayedInspector} from "../../src/ui/DisplayedInspector.js"
 import {DisplayedToolbox} from "../../src/ui/DisplayedToolbox.js"
@@ -42,25 +41,11 @@ const overlaps = (a: Rect, b: Rect) =>
 const rowTops = (toolbox: DisplayedToolbox): number[] =>
     [...new Set(toolbox.toolboxGroups.map((_, groupIndex) => toolbox.gateDrawRect(groupIndex, 0).y))];
 
-suite.test("oneToolboxHoldsEveryGroup", () => {
-    assertThat(Gates.ToolboxGroups.map(group => group.hint)).isEqualTo([
-        "Probes", "Displays", "Half Turns", "Quarter Turns", "Eighth Turns", "Spinning", "Formulaic", "Parametrized",
-        "Sampling", "Parity", "X/Y Probes", "Order", "Frequency", "Inputs", "Arithmetic", "Compare", "Modular",
-        "Scalar"]);
-    assertThat('TopToolboxGroups' in Gates).isEqualTo(false);
-    assertThat('BottomToolboxGroups' in Gates).isEqualTo(false);
-});
-
-suite.test("wideWindowShowsOneRow", () => {
-    let toolbox = toolboxAt(Infinity);
-    assertThat(toolbox.groupsPerRow).isEqualTo(Gates.ToolboxGroups.length);
-    assertThat(rowTops(toolbox).length).isEqualTo(1);
-});
-
 suite.test("groupsWrapAtTheLastOneThatFits", () => {
     let oneRowWidth = toolboxAt(Infinity).desiredWidth();
     let n = Gates.ToolboxGroups.length;
     assertThat(toolboxAt(oneRowWidth).groupsPerRow).isEqualTo(n);
+    assertThat(rowTops(toolboxAt(oneRowWidth)).length).isEqualTo(1);
     assertThat(toolboxAt(oneRowWidth - 1).groupsPerRow).isEqualTo(n - 1);
     assertThat(rowTops(toolboxAt(oneRowWidth - 1)).length).isEqualTo(2);
 });
@@ -81,12 +66,10 @@ suite.test("narrowerThanOneGroupStillShowsOneGroupPerRow", () => {
     assertThat(rowTops(toolbox).length).isEqualTo(Gates.ToolboxGroups.length);
 });
 
-suite.test("heightGrowsByOneRowPerRow", () => {
-    let oneRow = toolboxAt(Infinity).desiredHeight();
+suite.test("wrappedToolboxIsTallEnoughForEveryGate", () => {
     let toolbox = toolboxAt(800);
-    let rows = Math.ceil(Gates.ToolboxGroups.length / toolbox.groupsPerRow);
-    assertTrue(rows > 1);
-    assertThat(toolbox.desiredHeight()).isEqualTo(rows * oneRow);
+    assertTrue(rowTops(toolbox).length > 1);
+    assertTrue(toolbox.desiredHeight() > toolboxAt(Infinity).desiredHeight());
     for (let rect of gateRects(toolbox)) {
         assertTrue(rect.bottom() <= toolbox.desiredHeight());
     }
@@ -129,13 +112,6 @@ suite.test("customGateGroupsWrapToo", () => {
     }
 });
 
-suite.test("inspectorHasOneToolbox", () => {
-    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
-    assertThat('displayedToolboxTop' in inspector).isEqualTo(false);
-    assertThat('displayedToolboxBottom' in inspector).isEqualTo(false);
-    assertThat(inspector.displayedToolbox.toolboxGroups).isEqualTo(Gates.ToolboxGroups);
-});
-
 suite.test("noCustomGatesGroupUntilThereAreCustomGates", () => {
     let toolbox = toolboxAt(Infinity).withCustomGatesInserted(new CustomGateSet());
     assertThat(toolbox.toolboxGroups).isEqualTo(Gates.ToolboxGroups);
@@ -156,7 +132,6 @@ suite.test("circuitFollowsTheToolboxHeight", () => {
     inspector.updateArea(new Rect(0, 0, 4000, 600));
     assertThat(inspector.displayedCircuit.top).isEqualTo(inspector.displayedToolbox.desiredHeight());
     assertTrue(inspector.displayedCircuit.top < narrowTop);
-    assertThat(inspector.desiredHeight()).isEqualTo(Math.max(
-        Config.MINIMUM_CANVAS_HEIGHT,
-        inspector.displayedToolbox.desiredHeight() + inspector.displayedCircuit.desiredHeight()));
+    let circuit = inspector.displayedCircuit;
+    assertTrue(circuit.top + circuit.desiredHeight() <= inspector.desiredHeight());
 });

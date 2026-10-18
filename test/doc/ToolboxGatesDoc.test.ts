@@ -36,24 +36,7 @@ function sectionsOf(page: string): Array<[string, string]> {
 }
 
 /**
- * @returns The toolbox gates whose id isn't written, in backticks, in the section named after their group.
- */
-function undocumentedGates(page: string, groups: ToolboxGroup[]): string[] {
-    let sections = new Map(sectionsOf(page));
-    let missing: string[] = [];
-    for (let group of groups) {
-        let body = sections.get(group.hint) || '';
-        for (let gate of group.gates) {
-            if (gate !== undefined && !body.includes('`' + gate.serializedId + '`')) {
-                missing.push(`${group.hint}: ${gate.serializedId}`);
-            }
-        }
-    }
-    return missing;
-}
-
-/**
- * @returns The picture at the start of the table row that names each toolbox gate, or a note that it has none.
+ * @returns The picture at the start of the table row that names each toolbox gate, or a note saying what's missing.
  */
 function gatePictures(page: string, groups: ToolboxGroup[]): string[] {
     let sections = new Map(sectionsOf(page));
@@ -62,9 +45,13 @@ function gatePictures(page: string, groups: ToolboxGroup[]): string[] {
         let rows = (sections.get(group.hint) || '').split('\n').filter(line => line.startsWith('|'));
         for (let gate of group.gates) {
             if (gate !== undefined) {
-                let row = rows.find(line => line.includes('`' + gate.serializedId + '`')) || '';
-                let match = /^\| !\[[^\]]+\]\((\.\.\/images\/gates\/[a-z0-9-]+\.png)\) \|/.exec(row);
-                pictures.push(match === null ? `${group.hint}: ${gate.serializedId} has no picture` : match[1]);
+                let row = rows.find(line => line.includes('`' + gate.serializedId + '`'));
+                let match = row === undefined ? null :
+                    /^\| !\[[^\]]+\]\((\.\.\/images\/gates\/[a-z0-9-]+\.png)\) \|/.exec(row);
+                pictures.push(
+                    row === undefined ? `${group.hint}: ${gate.serializedId} has no table row` :
+                    match === null ? `${group.hint}: ${gate.serializedId} has no picture` :
+                    match[1]);
             }
         }
     }
@@ -75,12 +62,8 @@ suite.test("toolboxPageHasASectionPerGroupInToolboxOrder", () => {
     assertThat(sectionsOf(toolboxPage).map(e => e[0])).isEqualTo(Gates.ToolboxGroups.map(e => e.hint));
 });
 
-suite.test("toolboxPageNamesEveryGate", () => {
-    assertThat(undocumentedGates(toolboxPage, Gates.ToolboxGroups)).isEqualTo([]);
-});
-
-suite.test("everyGateRowStartsWithItsOwnPicture", () => {
+suite.test("everyGateHasARowStartingWithItsOwnPicture", () => {
     let pictures = gatePictures(toolboxPage, Gates.ToolboxGroups);
-    assertThat(pictures.filter(picture => picture.endsWith('has no picture'))).isEqualTo([]);
+    assertThat(pictures.filter(picture => !picture.startsWith('../images/'))).isEqualTo([]);
     assertThat(pictures.filter((picture, index) => pictures.indexOf(picture) !== index)).isEqualTo([]);
 });

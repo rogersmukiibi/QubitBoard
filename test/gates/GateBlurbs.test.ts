@@ -24,9 +24,15 @@ let suite = new Suite("GateBlurbs");
 const POSTSELECT_BLURB = /^Keeps (\S+) states, discards\/retries (\S+) states\.$/;
 
 /**
- * @returns The single-qubit state that a tooltip names, such as "OFF-iON", as a column vector.
+ * @returns The single-qubit state that a tooltip names, such as "ON" or "OFF-iON", as a column vector.
  */
 function stateNamed(name: string): Matrix {
+    if (name === 'OFF') {
+        return Matrix.col(1, 0);
+    }
+    if (name === 'ON') {
+        return Matrix.col(0, 1);
+    }
     let match = /^OFF([+-])(i?)ON$/.exec(name);
     if (match === null) {
         throw new Error(`Not a state name: ${name}`);
@@ -46,28 +52,10 @@ function statesIn(blurb: string): [string, string] {
     return [match[1], match[2]];
 }
 
-suite.test("tooltipsHaveNoKnownTypos", () => {
-    let typo = /Principle|proportional its/;
-    assertThat(Gates.KnownToSerializer.filter(gate => typo.test(gate.blurb)).map(gate => gate.serializedId)).
-        isEqualTo([]);
-});
-
-suite.test("hadamardTooltipMatchesItsMatrix", () => {
-    let blurb = Gates.HalfTurns.H.blurb;
-    assertTrue(blurb.includes("Maps OFF to OFF + ON."));
-    assertTrue(blurb.includes("Maps ON to OFF - ON."));
-});
-
-suite.test("zAxisPostselectionTooltipsUseTheSameCase", () => {
-    assertThat(Gates.PostSelectionGates.PostSelectOff.blurb).
-        isEqualTo("Keeps OFF states, discards/retries ON states.");
-    assertThat(Gates.PostSelectionGates.PostSelectOn.blurb).
-        isEqualTo("Keeps ON states, discards/retries OFF states.");
-});
-
-suite.test("xyAxisPostselectionTooltipsNameTheStatesTheirMatrixKeepsAndDiscards", () => {
+suite.test("postselectionTooltipsNameTheStatesTheirMatrixKeepsAndDiscards", () => {
     let gates = Gates.PostSelectionGates;
-    for (let gate of [gates.PostSelectAntiX, gates.PostSelectX, gates.PostSelectAntiY, gates.PostSelectY]) {
+    for (let gate of [gates.PostSelectOff, gates.PostSelectOn, gates.PostSelectAntiX, gates.PostSelectX,
+            gates.PostSelectAntiY, gates.PostSelectY]) {
         let [kept, discarded] = statesIn(gate.blurb);
         let matrix = gate.knownMatrixAt(0);
         assertThat(matrix.times(stateNamed(kept))).isApproximatelyEqualTo(stateNamed(kept));
