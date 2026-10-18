@@ -5,7 +5,8 @@ pageClass: gate-reference
 # Toolbox
 
 The toolbox above the circuit holds every gate you can drag into it.
-Its groups run from left to right and wrap onto another row when the window is too narrow to show them all.
+Its groups run from left to right in one row, each at most three gates tall. When the window is too narrow to show
+them all, turn the mouse wheel over the toolbox, or click the arrow at its edge, to scroll it. The circuit stays where it is.
 The sections below follow the same order.
 [Gates](index.md) explains the table columns.
 

@@ -111,8 +111,6 @@ let desiredCanvasSizeFor = curInspector => {
  * @returns {!DisplayedInspector}
  */
 const syncArea = ins => {
-    // The toolbox wraps to the width, so the desired height is only known once the width is applied.
-    ins.updateArea(new Rect(0, 0, desiredCanvasSizeFor(ins).w, ins.drawArea.h));
     let size = desiredCanvasSizeFor(ins);
     ins.updateArea(new Rect(0, 0, size.w, size.h));
     return ins;
@@ -192,6 +190,12 @@ watchDrags(canvasDiv,
         let oldInspector = displayed.get();
         let newHand = oldInspector.hand.withPos(pt);
         let newInspector = syncArea(oldInspector.withHand(newHand));
+        let scrolled = newInspector.tryScrollToolboxAt(pt);
+        if (scrolled !== undefined) {
+            displayed.set(scrolled);
+            ev.preventDefault();
+            return;
+        }
         clickDownGateButtonKey = (
             ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey ? undefined : newInspector.tryGetHandOverButtonKey());
         if (clickDownGateButtonKey !== undefined) {
@@ -279,6 +283,21 @@ canvasDiv.addEventListener('mousedown', ev => {
         ev.preventDefault();
     }
 });
+
+// Turning the wheel over the toolbox scrolls the toolbox instead of the page, so the circuit stays in place.
+canvasDiv.addEventListener('wheel', ev => {
+    let cur = syncArea(displayed.get());
+    if (eventPosRelativeTo(ev, canvas).y >= cur.displayedToolbox.desiredHeight()) {
+        return;
+    }
+    let scale = ev.deltaMode === 1 ? 40 : ev.deltaMode === 2 ? cur.drawArea.w : 1;
+    let delta = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+    let scrolled = cur.withToolboxScrolledBy(delta * scale);
+    if (scrolled !== cur) {
+        displayed.set(scrolled);
+        ev.preventDefault();
+    }
+}, {passive: false});
 
 // When mouse moves without dragging, track it (for showing hints and things).
 canvasDiv.addEventListener('mousemove', ev => {

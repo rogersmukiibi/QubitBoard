@@ -15,21 +15,25 @@
  */
 
 import {Suite, assertThat, assertTrue} from "../TestUtil.js"
+import {CircuitStats} from "../../src/circuit/CircuitStats.js"
 import {CustomGateSet} from "../../src/circuit/CustomGateSet.js"
+import {Painter} from "../../src/draw/Painter.js"
 import {DisplayedInspector} from "../../src/ui/DisplayedInspector.js"
 import {DisplayedToolbox} from "../../src/ui/DisplayedToolbox.js"
 import {Gates} from "../../src/gates/AllGates.js"
+import {Hand} from "../../src/ui/Hand.js"
+import {Point} from "../../src/math/Point.js"
 import {Rect} from "../../src/math/Rect.js"
 
 let suite = new Suite("DisplayedToolbox");
 
-const toolboxAt = (width: number) => new DisplayedToolbox('Toolbox', 0, Gates.ToolboxGroups).withWidth(width);
+const toolbox = () => new DisplayedToolbox('Toolbox', 0, Gates.ToolboxGroups);
 
-const gateRects = (toolbox: DisplayedToolbox): Rect[] => {
+const gateRects = (box: DisplayedToolbox): Rect[] => {
     let rects: Rect[] = [];
-    toolbox.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
+    box.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
         if (gate !== undefined) {
-            rects.push(toolbox.gateDrawRect(groupIndex, gateIndex));
+            rects.push(box.gateDrawRect(groupIndex, gateIndex));
         }
     }));
     return rects;
@@ -38,100 +42,175 @@ const gateRects = (toolbox: DisplayedToolbox): Rect[] => {
 const overlaps = (a: Rect, b: Rect) =>
     a.x < b.right() && b.x < a.right() && a.y < b.bottom() && b.y < a.bottom();
 
-const rowTops = (toolbox: DisplayedToolbox): number[] =>
-    [...new Set(toolbox.toolboxGroups.map((_, groupIndex) => toolbox.gateDrawRect(groupIndex, 0).y))];
-
-suite.test("groupsWrapAtTheLastOneThatFits", () => {
-    let oneRowWidth = toolboxAt(Infinity).desiredWidth();
-    let n = Gates.ToolboxGroups.length;
-    assertThat(toolboxAt(oneRowWidth).groupsPerRow).isEqualTo(n);
-    assertThat(rowTops(toolboxAt(oneRowWidth)).length).isEqualTo(1);
-    assertThat(toolboxAt(oneRowWidth - 1).groupsPerRow).isEqualTo(n - 1);
-    assertThat(rowTops(toolboxAt(oneRowWidth - 1)).length).isEqualTo(2);
+suite.test("everyGroupIsInOneRowFromLeftToRight", () => {
+    let box = toolbox();
+    let firstGates = box.toolboxGroups.map((_, groupIndex) => box.gateDrawRect(groupIndex, 0));
+    assertThat(new Set(firstGates.map(rect => rect.y)).size).isEqualTo(1);
+    let lefts = firstGates.map(rect => rect.x);
+    assertThat(lefts).isEqualTo([...lefts].sort((a, b) => a - b));
 });
 
-suite.test("everyGateFitsInsideTheWidth", () => {
-    for (let width of [400, 800, 1366, 1920]) {
-        let toolbox = toolboxAt(width);
-        assertTrue(toolbox.desiredWidth() <= width);
-        for (let rect of gateRects(toolbox)) {
-            assertTrue(rect.right() <= width);
+suite.test("groupsAreAtMostThreeGatesTall", () => {
+    assertThat(new Set(gateRects(toolbox()).map(rect => rect.y)).size).isEqualTo(3);
+});
+
+suite.test("pairsInTheFirstThreeRowsStaySideBySide", () => {
+    let box = toolbox();
+    box.toolboxGroups.forEach((group, groupIndex) => {
+        for (let gateIndex = 0; gateIndex + 1 < Math.min(6, group.gates.length); gateIndex += 2) {
+            let left = box.gateDrawRect(groupIndex, gateIndex);
+            let right = box.gateDrawRect(groupIndex, gateIndex + 1);
+            assertThat(right.y).isEqualTo(left.y);
+            assertTrue(right.x > left.x);
         }
-    }
+    });
 });
 
-suite.test("narrowerThanOneGroupStillShowsOneGroupPerRow", () => {
-    let toolbox = toolboxAt(10);
-    assertThat(toolbox.groupsPerRow).isEqualTo(1);
-    assertThat(rowTops(toolbox).length).isEqualTo(Gates.ToolboxGroups.length);
-});
-
-suite.test("wrappedToolboxIsTallEnoughForEveryGate", () => {
-    let toolbox = toolboxAt(800);
-    assertTrue(rowTops(toolbox).length > 1);
-    assertTrue(toolbox.desiredHeight() > toolboxAt(Infinity).desiredHeight());
-    for (let rect of gateRects(toolbox)) {
-        assertTrue(rect.bottom() <= toolbox.desiredHeight());
-    }
-});
-
-suite.test("wrappedGatesAndLabelsDontOverlap", () => {
-    let toolbox = toolboxAt(800);
-    let rects = gateRects(toolbox);
+suite.test("gatesDontOverlapEachOtherOrOtherGroupsLabels", () => {
+    let box = toolbox();
+    let rects = gateRects(box);
     for (let i = 0; i < rects.length; i++) {
         for (let j = i + 1; j < rects.length; j++) {
             assertThat(overlaps(rects[i], rects[j])).isEqualTo(false);
         }
     }
-    toolbox.toolboxGroups.forEach((group, groupIndex) => {
-        let label = toolbox.groupLabelRect(groupIndex);
-        toolbox.toolboxGroups.forEach((other, otherIndex) => other.gates.forEach((gate, gateIndex) => {
+    box.toolboxGroups.forEach((group, groupIndex) => {
+        let label = box.groupLabelRect(groupIndex);
+        box.toolboxGroups.forEach((other, otherIndex) => other.gates.forEach((gate, gateIndex) => {
             if (otherIndex !== groupIndex && gate !== undefined) {
-                assertThat(overlaps(label, toolbox.gateDrawRect(otherIndex, gateIndex))).isEqualTo(false);
+                assertThat(overlaps(label, box.gateDrawRect(otherIndex, gateIndex))).isEqualTo(false);
             }
         }));
     });
 });
 
-suite.test("wrappedGatesAreFoundWhereTheyAreDrawn", () => {
-    let toolbox = toolboxAt(800);
-    toolbox.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
+suite.test("toolboxIsWideAndTallEnoughForEveryGate", () => {
+    let box = toolbox();
+    for (let rect of gateRects(box)) {
+        assertTrue(rect.right() <= box.desiredWidth());
+        assertTrue(rect.bottom() <= box.desiredHeight());
+    }
+});
+
+suite.test("gatesAreFoundWhereTheyAreDrawn", () => {
+    let box = toolbox();
+    box.toolboxGroups.forEach((group, groupIndex) => group.gates.forEach((gate, gateIndex) => {
         if (gate !== undefined) {
-            let found = toolbox.findGateAt(toolbox.gateDrawRect(groupIndex, gateIndex).center());
+            let found = box.findGateAt(box.gateDrawRect(groupIndex, gateIndex).center());
             assertThat(found === undefined ? undefined : found.gate).isEqualTo(gate);
         }
     }));
 });
 
-suite.test("customGateGroupsWrapToo", () => {
-    let toolbox = toolboxAt(800).withCustomGatesInserted(new CustomGateSet(Gates.HalfTurns.X));
-    assertThat(toolbox.toolboxGroups.length).isEqualTo(Gates.ToolboxGroups.length + 1);
-    assertThat(toolbox.groupsPerRow).isEqualTo(toolboxAt(800).groupsPerRow);
-    for (let rect of gateRects(toolbox)) {
-        assertTrue(rect.right() <= 800);
-    }
+suite.test("customGatesGoAtTheEndOfTheRow", () => {
+    let box = toolbox().withCustomGatesInserted(new CustomGateSet(Gates.HalfTurns.X));
+    assertThat(box.toolboxGroups.length).isEqualTo(Gates.ToolboxGroups.length + 1);
+    let custom = box.gateDrawRect(box.toolboxGroups.length - 1, 0);
+    assertThat(custom.y).isEqualTo(box.gateDrawRect(0, 0).y);
+    assertTrue(custom.x >= toolbox().desiredWidth());
+    assertTrue(custom.right() <= box.desiredWidth());
 });
 
 suite.test("noCustomGatesGroupUntilThereAreCustomGates", () => {
-    let toolbox = toolboxAt(Infinity).withCustomGatesInserted(new CustomGateSet());
-    assertThat(toolbox.toolboxGroups).isEqualTo(Gates.ToolboxGroups);
-    assertThat(rowTops(toolbox).length).isEqualTo(1);
+    let box = toolbox().withCustomGatesInserted(new CustomGateSet());
+    assertThat(box.toolboxGroups).isEqualTo(Gates.ToolboxGroups);
 });
 
-suite.test("inspectorWrapsTheToolboxToItsWidth", () => {
-    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
-    assertThat(inspector.displayedToolbox.groupsPerRow).isEqualTo(toolboxAt(800).groupsPerRow);
-    assertTrue(inspector.desiredWidth() <= 800);
+suite.test("scrollingMovesTheGatesLeft", () => {
+    let box = toolbox().withViewWidth(800);
+    let scrolled = box.withScrolledBy(100);
+    assertThat(scrolled.scrollX).isEqualTo(100);
+    assertThat(scrolled.gateDrawRect(3, 1).x).isEqualTo(box.gateDrawRect(3, 1).x - 100);
+    let found = scrolled.findGateAt(scrolled.gateDrawRect(3, 1).center());
+    assertThat(found === undefined ? undefined : found.gate).isEqualTo(Gates.ToolboxGroups[3].gates[1]);
 });
 
-suite.test("circuitFollowsTheToolboxHeight", () => {
-    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
-    let narrowTop = inspector.displayedCircuit.top;
-    assertThat(narrowTop).isEqualTo(inspector.displayedToolbox.desiredHeight());
+suite.test("scrollingStopsAtBothEnds", () => {
+    let box = toolbox().withViewWidth(800);
+    assertThat(box.withScrolledBy(-50).scrollX).isEqualTo(0);
+    let end = box.withScrolledBy(1e6);
+    assertThat(end.scrollX).isEqualTo(box.desiredWidth() - 800);
+    assertThat(end.withScrolledBy(10).scrollX).isEqualTo(end.scrollX);
+    assertThat(end.withViewWidth(1500).scrollX).isEqualTo(box.desiredWidth() - 1500);
+    assertThat(end.withViewWidth(1e5).scrollX).isEqualTo(0);
+});
 
-    inspector.updateArea(new Rect(0, 0, 4000, 600));
+suite.test("scrollButtonsShowWhereThereIsMoreToSee", () => {
+    let box = toolbox().withViewWidth(800);
+    assertThat(box.scrollButtonRect(-1)).isEqualTo(undefined);
+    assertTrue(box.scrollButtonRect(+1) !== undefined);
+    let end = box.withScrolledBy(1e6);
+    assertTrue(end.scrollButtonRect(-1) !== undefined);
+    assertThat(end.scrollButtonRect(+1)).isEqualTo(undefined);
+    assertThat(toolbox().withViewWidth(1e5).scrollButtonRect(+1)).isEqualTo(undefined);
+});
+
+suite.test("aScrollButtonIsNotAGate", () => {
+    let box = toolbox().withViewWidth(800);
+    let button = box.scrollButtonRect(+1);
+    assertTrue(button !== undefined);
+    if (button !== undefined) {
+        assertThat(box.findGateAt(button.center())).isEqualTo(undefined);
+    }
+});
+
+suite.test("scrollingKeepsCustomGates", () => {
+    let box = toolbox().withViewWidth(800).withScrolledBy(100).
+        withCustomGatesInserted(new CustomGateSet(Gates.HalfTurns.X));
+    assertThat(box.scrollX).isEqualTo(100);
+    assertThat(box.withTop(5).scrollX).isEqualTo(100);
+});
+
+suite.test("touchBlockersStayInsideTheView", () => {
+    let canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 200;
+    for (let box of [toolbox().withViewWidth(800), toolbox().withViewWidth(800).withScrolledBy(300)]) {
+        let painter = new Painter(canvas);
+        box.paint(painter, CircuitStats.EMPTY, Hand.EMPTY);
+        assertTrue(painter.touchBlockers.length > 0);
+        for (let {rect} of painter.touchBlockers) {
+            assertTrue(rect.x >= 0 && rect.right() <= 800);
+        }
+    }
+});
+
+suite.test("inspectorDoesNotWidenForTheToolbox", () => {
+    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
+    assertTrue(inspector.desiredWidth() < toolbox().desiredWidth());
+});
+
+suite.test("inspectorKeepsTheToolboxScroll", () => {
+    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600)).withToolboxScrolledBy(100);
+    assertThat(inspector.displayedToolbox.scrollX).isEqualTo(100);
+    assertThat(inspector.withHand(Hand.EMPTY).displayedToolbox.scrollX).isEqualTo(100);
+    let circuit = inspector.displayedCircuit.circuitDefinition;
+    assertThat(inspector.withCircuitDefinition(circuit).displayedToolbox.scrollX).isEqualTo(100);
+    inspector.updateArea(new Rect(0, 0, 820, 600));
+    assertThat(inspector.displayedToolbox.scrollX).isEqualTo(100);
+});
+
+suite.test("inspectorScrollsTheToolboxFromItsButtons", () => {
+    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
+    let right = inspector.displayedToolbox.scrollButtonRect(+1);
+    assertTrue(right !== undefined);
+    if (right !== undefined) {
+        let scrolled = inspector.tryScrollToolboxAt(right.center());
+        assertTrue(scrolled !== undefined && scrolled.displayedToolbox.scrollX > 0);
+    }
+    assertThat(inspector.tryScrollToolboxAt(new Point(400, 300))).isEqualTo(undefined);
+});
+
+suite.test("hintsFadeOutAsTheToolboxScrollsAway", () => {
+    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
+    assertThat(inspector._hintVisibility()).isEqualTo(1);
+    assertTrue(inspector.withToolboxScrolledBy(50)._hintVisibility() < 1);
+    assertThat(inspector.withToolboxScrolledBy(200)._hintVisibility()).isEqualTo(0);
+});
+
+suite.test("circuitSitsBelowTheToolbox", () => {
+    let inspector = DisplayedInspector.empty(new Rect(0, 0, 800, 600));
     assertThat(inspector.displayedCircuit.top).isEqualTo(inspector.displayedToolbox.desiredHeight());
-    assertTrue(inspector.displayedCircuit.top < narrowTop);
     let circuit = inspector.displayedCircuit;
     assertTrue(circuit.top + circuit.desiredHeight() <= inspector.desiredHeight());
 });

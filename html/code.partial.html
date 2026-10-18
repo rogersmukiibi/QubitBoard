@@ -35,6 +35,9 @@
         .qb-code-hint {
             color: #888;
         }
+        .qb-code-close {
+            min-width: 30px;
+        }
         .qb-code-status {
             margin-left: auto;
             white-space: nowrap;
@@ -129,6 +132,7 @@
         <span class="qb-code-hint">Ctrl+Enter</span>
         <button id="code-panel-copy">Copy</button>
         <span id="code-panel-status" class="qb-code-status" role="status"></span>
+        <button id="code-panel-close" class="qb-code-close" title="Close the code panel (the Code button at the top opens it again)" aria-label="Close the code panel">✕</button>
     </div>
     <div id="code-panel-body" class="qb-code-body">
         <div id="code-panel-gutter" class="qb-code-gutter" aria-hidden="true"></div>

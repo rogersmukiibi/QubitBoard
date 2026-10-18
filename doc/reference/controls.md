@@ -7,6 +7,7 @@ A summary of the mouse and keyboard actions. [Editing circuits](../guide/editing
 | Action | How |
 |--------|-----|
 | Add gate | `drag` gate from toolbox to circuit |
+| See more of the toolbox | turn the mouse wheel over the toolbox **or** click the arrow at its edge |
 | Move gate | `drag` gate in circuit |
 | Remove gate | `drag` gate out of circuit **or** `middle-click` gate |
 | Undo | `ctrl + Z` **or** click 'undo' button |
@@ -17,6 +18,7 @@ A summary of the mouse and keyboard actions. [Editing circuits](../guide/editing
 | Remove qubit | re-arrange gates so that the bottom wire is unused |
 | Show intermediate state | `drag` a display gate onto the circuit |
 | Write circuit as code | type in the code panel at the bottom, then `ctrl + enter` **or** click 'Run' |
+| Hide the code panel | click '▾ Code' to minimise it **or** '✕' to close it; the 'Code' button at the top opens it again |
 | View tips | `hover` with mouse **or** awkwardly tap-hold with finger |
 
 ## Advanced actions
