@@ -27,6 +27,9 @@ import {Painter} from "../draw/Painter.js"
 import {Rect} from "../math/Rect.js"
 import {Serializer} from "../circuit/Serializer.js"
 
+/** The circuit top that the hint drawings' coordinates were written for. */
+const HINT_CIRCUIT_TOP = 148;
+
 class DisplayedInspector {
     /**
      * @param {!Rect} drawArea
@@ -49,7 +52,7 @@ class DisplayedInspector {
     }
 
     desiredWidth() {
-        return Math.max(this.displayedToolbox.minimumWidth(), this.displayedCircuit.desiredWidth());
+        return this.displayedCircuit.desiredWidth();
     }
 
     /**
@@ -58,8 +61,32 @@ class DisplayedInspector {
     updateArea(drawArea) {
         this.drawArea = drawArea;
 
-        this.displayedToolbox = this.displayedToolbox.withTop(0).withWidth(drawArea.w);
-        this.displayedCircuit = this.displayedCircuit.withTop(this.displayedToolbox.desiredHeight());
+        this.displayedToolbox = this.displayedToolbox.withTop(0).withViewWidth(drawArea.w);
+    }
+
+    /**
+     * @param {!number} dx Positive to bring gates on the right into view.
+     * @returns {!DisplayedInspector}
+     */
+    withToolboxScrolledBy(dx) {
+        let toolbox = this.displayedToolbox.withScrolledBy(dx);
+        if (toolbox === this.displayedToolbox) {
+            return this;
+        }
+        return new DisplayedInspector(this.drawArea, this.displayedCircuit, toolbox, this.hand);
+    }
+
+    /**
+     * @param {!Point} pt
+     * @returns {undefined|!DisplayedInspector} The inspector after scrolling the toolbox, when a scroll button is at
+     * the point.
+     */
+    tryScrollToolboxAt(pt) {
+        let direction = this.displayedToolbox.scrollButtonAt(pt);
+        if (direction === 0) {
+            return undefined;
+        }
+        return this.withToolboxScrolledBy(direction * Math.max(100, this.drawArea.w - 200));
     }
 
     /**
@@ -67,7 +94,7 @@ class DisplayedInspector {
      * @returns {!DisplayedInspector}
      */
     static empty(drawArea) {
-        let toolbox = new DisplayedToolbox('Toolbox', 0, Gates.ToolboxGroups, drawArea.w);
+        let toolbox = new DisplayedToolbox('Toolbox', 0, Gates.ToolboxGroups);
         return new DisplayedInspector(
             drawArea,
             DisplayedCircuit.empty(toolbox.desiredHeight()),
@@ -308,7 +335,9 @@ class DisplayedInspector {
 
         painter.ctx.save();
         painter.ctx.globalAlpha *= Math.min(1, visibilityFactor);
-        painter.ctx.translate(this.displayedCircuit.opRect(this.displayedCircuit.clampedCircuitColCount()).x - 280, 15);
+        painter.ctx.translate(
+            this.displayedCircuit.opRect(this.displayedCircuit.clampedCircuitColCount()).x - 280,
+            15 + this._hintCircuitShift());
 
         painter.ctx.save();
         painter.ctx.translate(268, 250);
@@ -340,9 +369,20 @@ class DisplayedInspector {
         if (this.displayedCircuit.circuitDefinition.columns.length > 0) {
             return 0;
         }
-        return this.hand.pos === undefined || !this.hand.isBusy() ? 1.0 :
+        let handFactor = this.hand.pos === undefined || !this.hand.isBusy() ? 1.0 :
             this.hand.heldGate !== undefined && this.hand.heldGate.isControl() ? 1.0 :
-            (150-this.hand.pos.y)/50;
+            (this.displayedCircuit.top + 2 - this.hand.pos.y) / 50;
+        // The hints point at gates near the toolbox's left end, so they fade away once it is scrolled.
+        let scrollFactor = Math.max(0, 1 - this.displayedToolbox.scrollX / 100);
+        return Math.min(handFactor, scrollFactor);
+    }
+
+    /**
+     * @returns {!number} How far the circuit is below where the hints were drawn for.
+     * @private
+     */
+    _hintCircuitShift() {
+        return this.displayedCircuit.top - HINT_CIRCUIT_TOP;
     }
 
 
@@ -356,11 +396,13 @@ class DisplayedInspector {
             return;
         }
 
+        let sx = this.displayedToolbox.scrollX;
+        let dy = this._hintCircuitShift();
         painter.ctx.save();
         painter.ctx.globalAlpha *= Math.min(1, visibilityFactor);
 
         painter.ctx.save();
-        painter.ctx.translate(130, 195);
+        painter.ctx.translate(130, 195 + dy);
         painter.ctx.rotate(Math.PI * 0.05);
         painter.ctx.fillStyle = 'red';
         painter.ctx.font = '16px sans-serif';
@@ -368,17 +410,17 @@ class DisplayedInspector {
         painter.ctx.restore();
 
         painter.ctx.beginPath();
-        painter.ctx.moveTo(268, 132);
+        painter.ctx.moveTo(268 - sx, 132);
         painter.ctx.bezierCurveTo(
-            260, 170,
-            235, 175,
-            217, 187);
+            260 - sx, 170 + dy,
+            235, 175 + dy,
+            217, 187 + dy);
         painter.ctx.strokeStyle = 'red';
         painter.ctx.lineWidth = 3;
         painter.ctx.stroke();
 
         painter.trace(tracer => {
-            tracer.arrowHead(210, 190, 10, Math.PI*0.84, 1.3);
+            tracer.arrowHead(210, 190 + dy, 10, Math.PI*0.84, 1.3);
         }).thenFill('red');
 
         painter.ctx.restore();
@@ -396,8 +438,9 @@ class DisplayedInspector {
         painter.ctx.save();
         painter.ctx.globalAlpha *= Math.min(1, visibilityFactor);
 
+        let sx = this.displayedToolbox.scrollX;
         let firstSlotAvailable = this.displayedCircuit.circuitDefinition.gateInSlot(0, 0) === undefined;
-        let fy = firstSlotAvailable ? 173 : 223;
+        let fy = (firstSlotAvailable ? 173 : 223) + this._hintCircuitShift();
 
         painter.ctx.save();
         painter.ctx.translate(70, fy-3);
@@ -409,16 +452,16 @@ class DisplayedInspector {
 
         painter.ctx.beginPath();
         if (firstSlotAvailable) {
-            painter.ctx.moveTo(90, 125);
+            painter.ctx.moveTo(90 - sx, 125);
             painter.ctx.bezierCurveTo(
-                60, 140,
-                48, 160,
+                60 - sx, 140,
+                48, fy - 13,
                 55, fy);
         } else {
-            painter.ctx.moveTo(100, 125);
+            painter.ctx.moveTo(100 - sx, 125);
             painter.ctx.bezierCurveTo(
-                115, 150,
-                105, 170,
+                115 - sx, 150,
+                105, fy - 53,
                 55, fy);
         }
         painter.ctx.strokeStyle = 'red';

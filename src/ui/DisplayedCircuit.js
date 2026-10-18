@@ -98,22 +98,6 @@ class DisplayedCircuit {
     }
 
     /**
-     * @param {!number} top
-     * @returns {!DisplayedCircuit}
-     */
-    withTop(top) {
-        if (top === this.top) {
-            return this;
-        }
-        return new DisplayedCircuit(
-            top,
-            this.circuitDefinition,
-            this._compressedColumnIndex,
-            this._highlightedSlot,
-            this._extraWireStartIndex);
-    }
-
-    /**
      * @returns {!boolean}
      */
     isBeingEdited() {

@@ -293,7 +293,6 @@ Gates.ToolboxGroups = [
         gates: [
             FourierTransformGates.FourierTransformFamily.ofSize(2),
                 FourierTransformGates.InverseFourierTransformFamily.ofSize(2),
-            undefined, undefined,
             PhaseGradientGates.PhaseGradientFamily.ofSize(2),
                 PhaseGradientGates.PhaseDegradientFamily.ofSize(2),
             PhaseGradientGates.DynamicPhaseGradientFamily.ofSize(2),

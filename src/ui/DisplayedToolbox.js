@@ -27,31 +27,35 @@ import {Point} from "../math/Point.js"
 import {seq} from "../base/Seq.js"
 import {WidgetPainter} from "../draw/WidgetPainter.js"
 
+/** Groups are at most this many gates tall. Gates after the first rows of pairs go into extra columns. */
+const GROUP_ROWS = 3;
+const SCROLL_BUTTON_WIDTH = 32;
+
 class DisplayedToolbox {
     /**
      * That thing showing gates you can grab.
      * @param {!string} name
      * @param {!number} top
      * @param {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} toolboxGroups
-     * @param {!number=} width Groups that don't fit in this width wrap onto another row.
      * @param {undefined|!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>=} originalGroups
      * @param {undefined|!CachablePainting=undefined} standardAppearance
+     * @param {!number=} scrollX How far the gates are scrolled to the left.
+     * @param {!number=} viewWidth The width the toolbox is shown in. Gates beyond it are reached by scrolling.
      */
     constructor(
             name,
             top,
             toolboxGroups,
-            width=Infinity,
             originalGroups=undefined,
-            standardAppearance=undefined) {
+            standardAppearance=undefined,
+            scrollX=0,
+            viewWidth=Infinity) {
         /** @type {!String} */
         this.name = name;
         /** @type {!number} */
         this.top = top;
         /** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
         this.toolboxGroups = toolboxGroups;
-        /** @type {!number} */
-        this.width = width;
         /** @type {!Array<!{hint: !string, gates: !Array<undefined|!Gate>}>} */
         this._originalGroups = originalGroups || this.toolboxGroups;
         /**
@@ -62,7 +66,7 @@ class DisplayedToolbox {
             () => ({width: this.desiredWidth(), height: this.desiredHeight()}),
             painter => {
                 painter.ctx.save();
-                painter.ctx.translate(0, -this.top);
+                painter.ctx.translate(this.scrollX, -this.top);
                 this._paintStandardContents(painter);
                 painter.ctx.restore();
             });
@@ -70,49 +74,88 @@ class DisplayedToolbox {
         /** @type {!int} */
         this.groupHeight = 1;
         for (let group of toolboxGroups) {
-            let h = Math.ceil(group.gates.length / 2);
+            let h = Math.min(GROUP_ROWS, Math.ceil(group.gates.length / 2));
             this.groupHeight = Math.max(this.groupHeight, h);
         }
 
-        /** @type {!int} */
-        this.groupsPerRow = Math.max(1, toolboxGroups.length);
-        while (this.groupsPerRow > 1 && DisplayedToolbox._rowWidth(this.groupsPerRow) > width) {
-            this.groupsPerRow--;
+        /**
+         * The left edge of each group, followed by where a group after the last one would start.
+         * @type {!Array<!number>}
+         * @private
+         */
+        this._groupLefts = [Config.TOOLBOX_MARGIN_X];
+        for (let group of toolboxGroups) {
+            let left = this._groupLefts[this._groupLefts.length - 1];
+            this._groupLefts.push(
+                left + DisplayedToolbox._columnCount(group) * Config.TOOLBOX_GATE_SPAN + Config.TOOLBOX_GROUP_SPACING);
         }
+
+        /** @type {!number} */
+        this.viewWidth = viewWidth;
+        /** @type {!number} */
+        this.scrollX = Math.max(0, Math.min(scrollX, this.desiredWidth() - viewWidth));
     }
 
     /**
-     * @param {!int} groupCount
-     * @returns {!number} The width taken by a row of this many groups.
-     * @private
-     */
-    static _rowWidth(groupCount) {
-        return Config.TOOLBOX_MARGIN_X +
-            (groupCount - 1) * Config.TOOLBOX_GROUP_SPAN +
-            Config.TOOLBOX_GATE_SPAN +
-            Config.GATE_RADIUS * 2 +
-            5.5;
-    }
-
-    /**
-     * @param {!number} width
+     * @param {!number} viewWidth
      * @returns {!DisplayedToolbox}
      */
-    withWidth(width) {
-        if (width === this.width) {
+    withViewWidth(viewWidth) {
+        return this._withScroll(this.scrollX, viewWidth);
+    }
+
+    /**
+     * @param {!number} dx Positive to bring gates on the right into view.
+     * @returns {!DisplayedToolbox}
+     */
+    withScrolledBy(dx) {
+        return this._withScroll(this.scrollX + dx, this.viewWidth);
+    }
+
+    /**
+     * @param {!number} scrollX
+     * @param {!number} viewWidth
+     * @returns {!DisplayedToolbox}
+     * @private
+     */
+    _withScroll(scrollX, viewWidth) {
+        if (scrollX === this.scrollX && viewWidth === this.viewWidth) {
             return this;
         }
-        let result = new DisplayedToolbox(
+        return new DisplayedToolbox(
             this.name,
             this.top,
             this.toolboxGroups,
-            width,
             this._originalGroups,
-            this._standardApperance);
-        if (result.groupsPerRow === this.groupsPerRow) {
-            return result;
+            this._standardApperance,
+            scrollX,
+            viewWidth);
+    }
+
+    /**
+     * @param {!int} direction -1 for the button that scrolls back to the left, +1 for the one that scrolls right.
+     * @returns {undefined|!Rect} The button, when there are gates to see in that direction.
+     */
+    scrollButtonRect(direction) {
+        let maxScroll = this.desiredWidth() - this.viewWidth;
+        if (direction < 0 ? this.scrollX <= 0 : this.scrollX >= maxScroll) {
+            return undefined;
         }
-        return new DisplayedToolbox(this.name, this.top, this.toolboxGroups, width, this._originalGroups);
+        let x = direction < 0 ? 0 : this.viewWidth - SCROLL_BUTTON_WIDTH;
+        return new Rect(x, this.top, SCROLL_BUTTON_WIDTH, this.desiredHeight());
+    }
+
+    /**
+     * @param {!{hint: !string, gates: !Array<undefined|!Gate>}} group
+     * @returns {!int} Two columns for the pairs in the first rows, and more for any gates after them.
+     * @private
+     */
+    static _columnCount(group) {
+        let used = group.gates.length;
+        while (used > 0 && group.gates[used - 1] === undefined) {
+            used--;
+        }
+        return 2 + Math.ceil(Math.max(0, used - GROUP_ROWS * 2) / GROUP_ROWS);
     }
 
     /**
@@ -134,9 +177,10 @@ class DisplayedToolbox {
             this.name,
             this.top,
             groups,
-            this.width,
             this._originalGroups,
-            this._standardApperance);
+            this._standardApperance,
+            this.scrollX,
+            this.viewWidth);
     }
 
     /**
@@ -145,18 +189,12 @@ class DisplayedToolbox {
      * @returns {!Rect}
      */
     gateDrawRect(groupIndex, gateIndex) {
-        let dx = gateIndex % 2;
-        let dy = Math.floor(gateIndex / 2);
-        let column = groupIndex % this.groupsPerRow;
-        let row = Math.floor(groupIndex / this.groupsPerRow);
+        let pairSlots = GROUP_ROWS * 2;
+        let dx = gateIndex < pairSlots ? gateIndex % 2 : 2 + Math.floor((gateIndex - pairSlots) / GROUP_ROWS);
+        let dy = gateIndex < pairSlots ? Math.floor(gateIndex / 2) : (gateIndex - pairSlots) % GROUP_ROWS;
 
-        let x = Config.TOOLBOX_MARGIN_X +
-            dx * Config.TOOLBOX_GATE_SPAN +
-            column * Config.TOOLBOX_GROUP_SPAN;
-        let y = this.top +
-            Config.TOOLBOX_MARGIN_Y +
-            row * this._rowHeight() +
-            dy * Config.TOOLBOX_GATE_SPAN;
+        let x = this._groupLefts[groupIndex] + dx * Config.TOOLBOX_GATE_SPAN - this.scrollX;
+        let y = this.top + Config.TOOLBOX_MARGIN_Y + dy * Config.TOOLBOX_GATE_SPAN;
 
         return new Rect(
             Math.round(x - 0.5) + 0.5,
@@ -171,8 +209,8 @@ class DisplayedToolbox {
      */
     groupLabelRect(groupIndex) {
         let r = this.gateDrawRect(groupIndex, 0);
-        let c = new Point(r.x + Config.TOOLBOX_GATE_SPAN - Config.TOOLBOX_GATE_SPACING / 2, r.y - 18);
-        return new Rect(c.x - Config.TOOLBOX_GATE_SPAN, c.y, Config.TOOLBOX_GATE_SPAN * 2, 20);
+        let width = this._groupLefts[groupIndex + 1] - this._groupLefts[groupIndex] - Config.TOOLBOX_GROUP_SPACING;
+        return new Rect(r.x - Config.TOOLBOX_GATE_SPACING / 2, r.y - 18, width, 20);
     }
 
     /**
@@ -182,7 +220,7 @@ class DisplayedToolbox {
      * @returns {undefined|!{groupIndex: !int, gateIndex: !int, gate: !Gate, rect: !Rect}}
      */
     findGateAt(pt) {
-        if (pt === undefined) {
+        if (pt === undefined || this.scrollButtonAt(pt) !== 0) {
             return undefined;
         }
         for (let groupIndex = 0; groupIndex < this.toolboxGroups.length; groupIndex++) {
@@ -199,6 +237,20 @@ class DisplayedToolbox {
     }
 
     /**
+     * @param {!Point} pt
+     * @returns {!int} The direction of the scroll button at the point, or 0 when there isn't one.
+     */
+    scrollButtonAt(pt) {
+        for (let direction of [-1, +1]) {
+            let rect = this.scrollButtonRect(direction);
+            if (rect !== undefined && rect.containsPoint(pt)) {
+                return direction;
+            }
+        }
+        return 0;
+    }
+
+    /**
      * @param {!DisplayedToolbox|*} other
      * @returns {!boolean}
      */
@@ -207,7 +259,8 @@ class DisplayedToolbox {
             this.name === other.name &&
             this.top === other.top &&
             this.toolboxGroups === other.toolboxGroups &&
-            this.width === other.width;
+            this.scrollX === other.scrollX &&
+            this.viewWidth === other.viewWidth;
     }
 
     /**
@@ -219,9 +272,10 @@ class DisplayedToolbox {
             this.name,
             newTop,
             this.toolboxGroups,
-            this.width,
             this._originalGroups,
-            this._standardApperance);
+            this._standardApperance,
+            this.scrollX,
+            this.viewWidth);
     }
 
     /**
@@ -239,8 +293,40 @@ class DisplayedToolbox {
      */
     paint(painter, stats, hand) {
         painter.fillRect(this.curArea(painter.canvas.width), Config.BACKGROUND_COLOR_TOOLBOX);
-        this._standardApperance.paint(0, this.top, painter);
+        this._standardApperance.paint(-this.scrollX, this.top, painter);
         this._paintDeviations(painter, stats, hand);
+        this._paintScrollButtons(painter, hand);
+    }
+
+    /**
+     * @param {!Painter} painter
+     * @param {!Hand} hand
+     * @private
+     */
+    _paintScrollButtons(painter, hand) {
+        for (let direction of [-1, +1]) {
+            let rect = this.scrollButtonRect(direction);
+            if (rect === undefined) {
+                continue;
+            }
+            let hovered = hand.pos !== undefined && rect.containsPoint(hand.pos);
+            painter.fillRect(rect, hovered ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)');
+            painter.strokeLine(
+                new Point(direction < 0 ? rect.right() : rect.x, rect.y),
+                new Point(direction < 0 ? rect.right() : rect.x, rect.bottom()),
+                '#999');
+            painter.print(
+                direction < 0 ? '‹' : '›',
+                rect.center().x,
+                rect.center().y,
+                'center',
+                'middle',
+                'black',
+                '32px sans-serif',
+                rect.w,
+                rect.h);
+            painter.noteTouchBlocker({rect, cursor: 'pointer'});
+        }
     }
 
     /**
@@ -274,14 +360,17 @@ class DisplayedToolbox {
                 this._paintGatesInGroup(painter, hand, groupIndex);
             }
 
-            // Keep scroll blockers positioned over gates.
+            // Keep scroll blockers positioned over the visible parts of gates.
             let group = this.toolboxGroups[groupIndex];
             for (let gateIndex = 0; gateIndex < group.gates.length; gateIndex++) {
-                if (group.gates[gateIndex] !== undefined) {
-                    painter.noteTouchBlocker({
-                        rect: this.gateDrawRect(groupIndex, gateIndex),
-                        cursor: 'pointer'}
-                    );
+                if (group.gates[gateIndex] === undefined) {
+                    continue;
+                }
+                let rect = this.gateDrawRect(groupIndex, gateIndex);
+                let left = Math.max(0, rect.x);
+                let right = Math.min(this.viewWidth, rect.right());
+                if (right > left) {
+                    painter.noteTouchBlocker({rect: new Rect(left, rect.y, right - left, rect.h), cursor: 'pointer'});
                 }
             }
         }
@@ -383,28 +472,15 @@ class DisplayedToolbox {
      * @returns {!number}
      */
     desiredWidth() {
-        return this.gateDrawRect(Math.min(this.groupsPerRow, this.toolboxGroups.length) - 1, 5).right() + 5;
+        let end = this._groupLefts[this._groupLefts.length - 1];
+        return end - Config.TOOLBOX_GROUP_SPACING - Config.TOOLBOX_GATE_SPACING + 5.5;
     }
 
-    /**
-     * @returns {!number} The width of a single group, which is as narrow as the toolbox wraps.
-     */
-    minimumWidth() {
-        return DisplayedToolbox._rowWidth(1);
-    }
-
+    //noinspection JSMethodCanBeStatic
     /**
      * @returns {!number}
      */
     desiredHeight() {
-        return Math.ceil(this.toolboxGroups.length / this.groupsPerRow) * this._rowHeight();
-    }
-
-    /**
-     * @returns {!number}
-     * @private
-     */
-    _rowHeight() {
         return (1 + this.groupHeight) * (Config.GATE_RADIUS * 2 + 2) - Config.GATE_RADIUS;
     }
 

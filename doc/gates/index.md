@@ -1,7 +1,8 @@
 # Gates
 
 QubitBoard's gates live in the toolbox above the circuit, which is divided into named groups.
-The groups run from left to right and wrap onto another row when the window is too narrow to show them all.
+The groups run from left to right in one row. When they don't all fit, scroll the toolbox with the mouse wheel or
+the arrows at its edges; the circuit doesn't move.
 The [Toolbox](toolbox.md) page has one section per group, in the order the groups appear on screen.
 
 ![The toolbox](../images/toolbox.png)
