@@ -21,9 +21,8 @@ The panel and the circuit stay in sync in both directions, but in different ways
 
 - Choose the language from the drop-down next to the **Code** button: **Cirq** (the default), **OpenQASM 3** or **QubitBoard**. The code is rewritten in the new language right away.
 - While you're typing in the panel, Ctrl+Z and Ctrl+Y undo and redo your typing, not the circuit.
-- **Copy** copies the code. **▾ Code** minimises the panel to a thin bar, and you can drag the panel's top edge to resize it.
-- **✕** closes the panel. The **Code** button at the top of the page opens it again. QubitBoard remembers whether the
-  panel was closed or minimised.
+- **Copy** copies the code. **▾ Code** minimises the panel to a thin bar, and **▸ Code** brings it back. QubitBoard
+  remembers whether the panel was minimised. Drag the panel's top edge to resize it.
 - Tab indents. Press Escape to move focus out of the editor.
 
 ## Languages

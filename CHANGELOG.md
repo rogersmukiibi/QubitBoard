@@ -28,11 +28,10 @@ behave differently is marked **(breaking)**.
 - **One toolbox above the circuit** in place of a toolbox above it and another below it. The groups of the old bottom
   toolbox follow those of the top one in a single row, each group at most three gates tall (groups with seven or eight
   gates get a third column). When the window is too narrow, the mouse wheel or the arrows at the toolbox's edges
-  scroll the toolbox on its own, so the circuit stays in place and gates are dragged as short a way as before. The
+  scroll the toolbox on its own, until its last groups reach the middle of the window, so the circuit stays in place
+  and gates are dragged as short a way as before. The
   red hints on a new circuit follow the gates they point at, and fade out once the toolbox is scrolled. The
   **Custom Gates** group only appears once the circuit has a custom gate. Circuit links and gate ids are unchanged.
-- **The code panel can be closed** with its ✕ button, and the new **Code** button at the top of the page opens it
-  again. Whether it was closed is remembered, like whether it was minimised.
 - **Circuits are simulated with WebGL2** when the browser has it, and with WebGL1 otherwise. The shaders are
   unchanged, and the simulation was as fast with either version in the performance tests. The unit tests run under
   both versions.

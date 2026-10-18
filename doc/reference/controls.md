@@ -18,7 +18,7 @@ A summary of the mouse and keyboard actions. [Editing circuits](../guide/editing
 | Remove qubit | re-arrange gates so that the bottom wire is unused |
 | Show intermediate state | `drag` a display gate onto the circuit |
 | Write circuit as code | type in the code panel at the bottom, then `ctrl + enter` **or** click 'Run' |
-| Hide the code panel | click '▾ Code' to minimise it **or** '✕' to close it; the 'Code' button at the top opens it again |
+| Minimise the code panel | click '▾ Code'; click '▸ Code' to bring it back |
 | View tips | `hover` with mouse **or** awkwardly tap-hold with finger |
 
 ## Advanced actions

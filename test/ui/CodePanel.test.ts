@@ -24,7 +24,6 @@ let suite = new Suite("CodePanel");
 const STORAGE_KEYS = ['qubitboard.codePanel.collapsed', 'qubitboard.codePanel.closed'];
 
 const ELEMENTS = `
-    <button id="code-panel-show"></button>
     <div id="code-panel" style="display: none">
         <div id="code-panel-resize"></div>
         <button id="code-panel-toggle"></button>
@@ -32,7 +31,6 @@ const ELEMENTS = `
         <button id="code-panel-run"></button>
         <button id="code-panel-copy"></button>
         <span id="code-panel-status"></span>
-        <button id="code-panel-close"></button>
         <div id="code-panel-body">
             <div id="code-panel-gutter"></div>
             <pre id="code-panel-highlight"></pre>
@@ -84,32 +82,15 @@ suite.test("minimisingHidesTheCodeButKeepsTheHeader", () => withPanel(byId => {
     assertThat(byId('code-panel-body').style.display).isEqualTo('flex');
 }));
 
-suite.test("closingHidesThePanelAndTheTopBarButtonBringsItBack", () => withPanel(byId => {
+suite.test("aMinimisedPanelStartsMinimised", () => withPanel(byId => {
+    window.localStorage.setItem('qubitboard.codePanel.collapsed', 'true');
     init();
-    assertThat(byId('code-panel-show').getAttribute('aria-pressed')).isEqualTo('true');
-    byId('code-panel-close').click();
-    assertThat(byId('code-panel').style.display).isEqualTo('none');
-    assertThat(document.body.style.paddingBottom).isEqualTo('0px');
-    assertThat(byId('code-panel-show').getAttribute('aria-pressed')).isEqualTo('false');
-    byId('code-panel-show').click();
     assertThat(byId('code-panel').style.display).isEqualTo('block');
-    assertThat(byId('code-panel-show').getAttribute('aria-pressed')).isEqualTo('true');
+    assertThat(byId('code-panel-body').style.display).isEqualTo('none');
 }));
 
-suite.test("theTopBarButtonAlsoClosesThePanel", () => withPanel(byId => {
-    init();
-    byId('code-panel-show').click();
-    assertThat(byId('code-panel').style.display).isEqualTo('none');
-}));
-
-suite.test("aClosedPanelStaysClosedNextTime", () => withPanel(byId => {
-    init();
-    byId('code-panel-close').click();
-    assertThat(window.localStorage.getItem('qubitboard.codePanel.closed')).isEqualTo('true');
-}));
-
-suite.test("aPanelClosedLastTimeStartsClosed", () => withPanel(byId => {
+suite.test("thePanelAlwaysShowsEvenIfAnEarlierVersionSavedItClosed", () => withPanel(byId => {
     window.localStorage.setItem('qubitboard.codePanel.closed', 'true');
     init();
-    assertThat(byId('code-panel').style.display).isEqualTo('none');
+    assertThat(byId('code-panel').style.display).isEqualTo('block');
 }));

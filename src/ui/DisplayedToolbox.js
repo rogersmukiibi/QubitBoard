@@ -93,7 +93,17 @@ class DisplayedToolbox {
         /** @type {!number} */
         this.viewWidth = viewWidth;
         /** @type {!number} */
-        this.scrollX = Math.max(0, Math.min(scrollX, this.desiredWidth() - viewWidth));
+        this.scrollX = Math.max(0, Math.min(scrollX, this._maxScroll()));
+    }
+
+    /**
+     * @returns {!number} How far the toolbox scrolls. When it doesn't fit, it scrolls until its end is halfway across
+     * the view, so the last groups can be brought to the middle.
+     * @private
+     */
+    _maxScroll() {
+        let width = this.desiredWidth();
+        return width > this.viewWidth ? width - this.viewWidth / 2 : 0;
     }
 
     /**
@@ -137,8 +147,7 @@ class DisplayedToolbox {
      * @returns {undefined|!Rect} The button, when there are gates to see in that direction.
      */
     scrollButtonRect(direction) {
-        let maxScroll = this.desiredWidth() - this.viewWidth;
-        if (direction < 0 ? this.scrollX <= 0 : this.scrollX >= maxScroll) {
+        if (direction < 0 ? this.scrollX <= 0 : this.scrollX >= this._maxScroll()) {
             return undefined;
         }
         let x = direction < 0 ? 0 : this.viewWidth - SCROLL_BUTTON_WIDTH;
