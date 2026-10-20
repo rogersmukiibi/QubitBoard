@@ -383,7 +383,7 @@ class DisplayedCircuit {
                 if (this._highlightedSlot === undefined && hand.pos !== undefined && rect.containsPoint(hand.pos)) {
                     painter.fillRect(rect, Config.HIGHLIGHTED_GATE_FILL_COLOR);
                 }
-                painter.print(`|${v}⟩`, 20, y, 'right', 'middle', 'black', '14px sans-serif', 20, Config.WIRE_SPACING);
+                painter.print(`|${v}⟩`, 20, y, 'right', 'middle', Config.DEFAULT_TEXT_COLOR, '14px sans-serif', 20, Config.WIRE_SPACING);
             }
         }
 
@@ -412,7 +412,7 @@ class DisplayedCircuit {
                     }
                     lastX = x;
                 }
-            }).thenStroke('black');
+            }).thenStroke(Config.DEFAULT_STROKE_COLOR);
         }
         painter.ctx.restore();
         if (this._extraWireStartIndex !== undefined && this.circuitDefinition.numWires === Config.MAX_WIRE_COUNT) {
@@ -422,7 +422,7 @@ class DisplayedCircuit {
                 this.wireRect(Config.MAX_WIRE_COUNT).y,
                 'left',
                 'top',
-                'red',
+                Config.ALERT_COLOR,
                 '16px bold monospace',
                 400,
                 Config.WIRE_SPACING);
@@ -593,7 +593,7 @@ class DisplayedCircuit {
             pt.y - 28,
             'center',
             'bottom',
-            'red',
+            Config.ALERT_COLOR,
             '14px sans-serif',
             800,
             50);
@@ -603,7 +603,7 @@ class DisplayedCircuit {
             pt.y - 13,
             'center',
             'bottom',
-            'red',
+            Config.ALERT_COLOR,
             '14px sans-serif',
             800,
             50);
@@ -614,8 +614,8 @@ class DisplayedCircuit {
             this._highlightedSlot.col === col &&
             this._highlightedSlot.row === undefined) {
             let rect = this.gateRect(0, col, 1, this._groundedWireCount()).paddedBy(3);
-            painter.fillRect(rect, 'rgba(255, 196, 112, 0.7)');
-            painter.strokeRect(rect, 'black');
+            painter.fillRect(rect, Config.DRAG_HIGHLIGHT_COLOR);
+            painter.strokeRect(rect, Config.DEFAULT_STROKE_COLOR);
         }
     }
 
@@ -631,8 +631,8 @@ class DisplayedCircuit {
             let row = this._highlightedSlot.row;
             let w = this.gateRect(row, this.clampedCircuitColCount() + 1).x;
             let rect = this.wireRect(row).takeLeft(w);
-            painter.fillRect(rect, 'rgba(255, 196, 112, 0.7)');
-            painter.strokeRect(rect, 'black');
+            painter.fillRect(rect, Config.DRAG_HIGHLIGHT_COLOR);
+            painter.strokeRect(rect, Config.DEFAULT_STROKE_COLOR);
         }
     }
 
@@ -1306,7 +1306,7 @@ class DisplayedCircuit {
             "Local wire states\n(Chance/Bloch)",
             new Rect(x, bottom+4, 190, 40),
             new Point(0.5, 0),
-            'gray');
+            Config.SUBTLE_TEXT_COLOR);
 
         this._drawOutputSuperpositionDisplay(painter, stats, hand);
     }
@@ -1338,7 +1338,7 @@ class DisplayedCircuit {
             amplitudeGrid,
             gridRect,
             numWire < Config.SIMPLE_SUPERPOSITION_DRAWING_WIRE_THRESHOLD ? Config.SUPERPOSITION_MID_COLOR : undefined,
-            'black',
+            Config.DEFAULT_STROKE_COLOR,
             numWire < Config.SIMPLE_SUPERPOSITION_DRAWING_WIRE_THRESHOLD ? Config.SUPERPOSITION_FORE_COLOR : undefined,
             Config.SUPERPOSITION_BACK_COLOR);
         let forceSign = v => (v >= 0 ? '+' : '') + v.toFixed(2);
@@ -1413,7 +1413,7 @@ class DisplayedCircuit {
             gridRect.bottom() + 3,
             'left',
             'top',
-            'gray',
+            Config.SUBTLE_TEXT_COLOR,
             '12px sans-serif',
             100,
             20);
@@ -1428,7 +1428,7 @@ class DisplayedCircuit {
                     100,
                     75),
                 new Point(0.5, 0),
-                'red');
+                Config.ALERT_COLOR);
         }
 
         // Discard rate warning.
@@ -1451,7 +1451,7 @@ class DisplayedCircuit {
                 gridRect.bottom() + SUPERPOSITION_GRID_LABEL_SPAN,
                 'right',
                 'bottom',
-                'red',
+                Config.ALERT_COLOR,
                 '14px sans-serif',
                 800,
                 50);
@@ -1612,7 +1612,7 @@ function _drawLabelsReasonablyFast(painter, dy, n, labeller, boundingWidth) {
     let pad = 1/scale;
     ctx.scale(scale, scale);
     ctx.translate(0, dy*0.5/scale - h*0.5);
-    ctx.fillStyle = 'lightgray';
+    ctx.fillStyle = Config.LABEL_BACK_COLOR;
     if (h < step*0.95) {
         for (let i = 0; i < n; i++) {
             ctx.fillRect(0, step*i, w + 2*pad, h);
@@ -1620,7 +1620,7 @@ function _drawLabelsReasonablyFast(painter, dy, n, labeller, boundingWidth) {
     } else {
         ctx.fillRect(0, 0, w + 2*pad, step*n);
     }
-    ctx.fillStyle = 'black';
+    ctx.fillStyle = Config.DEFAULT_TEXT_COLOR;
     for (let i = 0; i < n; i++) {
         ctx.fillText(labeller(i), pad, h*0.5 + step*i);
     }

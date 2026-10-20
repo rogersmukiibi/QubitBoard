@@ -17,6 +17,13 @@ behave differently is marked **(breaking)**.
 
 ### Added
 
+- **Dark mode.** A "Theme" button above the circuit cycles Auto, Light and Dark. Auto, the default, follows the
+  system's `prefers-color-scheme` and switches with it; the choice is remembered in the browser. Dark covers the
+  circuit canvas, the toolbox, tooltips, the menu, the export and gate dialogs, and the code panel with its syntax
+  colors. The canvas colors now come from light and dark palettes in `src/Palette.ts`, read through the `Config` color
+  getters; the light palette keeps Quirk's colors, so light mode looks as before, apart from the "resize" label on a
+  highlighted resize tab, which is black instead of `#222`.
+
 - **Gate reference** in the documentation: every gate in the toolbox, with a section per toolbox group, showing each
   gate's picture, name, id, sizes and effect. A unit test fails when the page and the toolbox in
   `src/gates/AllGates.js` disagree, and `npm run screenshot-gates` retakes the pictures from the app.

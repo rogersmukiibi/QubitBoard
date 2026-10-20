@@ -342,7 +342,7 @@ class DisplayedInspector {
         painter.ctx.save();
         painter.ctx.translate(268, 250);
         painter.ctx.rotate(Math.PI * 0.02);
-        painter.ctx.fillStyle = 'red';
+        painter.ctx.fillStyle = Config.ALERT_COLOR;
         painter.ctx.textAlign = 'right';
         painter.ctx.font = '16px sans-serif';
         painter.ctx.fillText("outputs change", 0, 0);
@@ -354,13 +354,13 @@ class DisplayedInspector {
             300, 245,
             315, 235,
             325, 225);
-        painter.ctx.strokeStyle = 'red';
+        painter.ctx.strokeStyle = Config.ALERT_COLOR;
         painter.ctx.lineWidth = 3;
         painter.ctx.stroke();
 
         painter.trace(tracer => {
             tracer.arrowHead(330, 219, 10, Math.PI*-0.265, 1.3);
-        }).thenFill('red');
+        }).thenFill(Config.ALERT_COLOR);
 
         painter.ctx.restore();
     }
@@ -404,7 +404,7 @@ class DisplayedInspector {
         painter.ctx.save();
         painter.ctx.translate(130, 195 + dy);
         painter.ctx.rotate(Math.PI * 0.05);
-        painter.ctx.fillStyle = 'red';
+        painter.ctx.fillStyle = Config.ALERT_COLOR;
         painter.ctx.font = '16px sans-serif';
         painter.ctx.fillText("drag gates onto circuit", 0, 0);
         painter.ctx.restore();
@@ -415,13 +415,13 @@ class DisplayedInspector {
             260 - sx, 170 + dy,
             235, 175 + dy,
             217, 187 + dy);
-        painter.ctx.strokeStyle = 'red';
+        painter.ctx.strokeStyle = Config.ALERT_COLOR;
         painter.ctx.lineWidth = 3;
         painter.ctx.stroke();
 
         painter.trace(tracer => {
             tracer.arrowHead(210, 190 + dy, 10, Math.PI*0.84, 1.3);
-        }).thenFill('red');
+        }).thenFill(Config.ALERT_COLOR);
 
         painter.ctx.restore();
     }
@@ -445,7 +445,7 @@ class DisplayedInspector {
         painter.ctx.save();
         painter.ctx.translate(70, fy-3);
         painter.ctx.rotate(Math.PI * -0.01);
-        painter.ctx.fillStyle = 'red';
+        painter.ctx.fillStyle = Config.ALERT_COLOR;
         painter.ctx.font = '16px sans-serif';
         painter.ctx.fillText("use controls", 0, 0);
         painter.ctx.restore();
@@ -464,12 +464,12 @@ class DisplayedInspector {
                 105, fy - 53,
                 55, fy);
         }
-        painter.ctx.strokeStyle = 'red';
+        painter.ctx.strokeStyle = Config.ALERT_COLOR;
         painter.ctx.lineWidth = 3;
         painter.ctx.stroke();
         painter.ctx.beginPath();
         painter.ctx.arc(55, fy, 5, 0, 2 * Math.PI);
-        painter.ctx.fillStyle = 'red';
+        painter.ctx.fillStyle = Config.ALERT_COLOR;
         painter.ctx.fill();
 
         painter.ctx.restore();

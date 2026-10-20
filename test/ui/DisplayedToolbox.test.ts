@@ -24,6 +24,7 @@ import {Gates} from "../../src/gates/AllGates.js"
 import {Hand} from "../../src/ui/Hand.js"
 import {Point} from "../../src/math/Point.js"
 import {Rect} from "../../src/math/Rect.js"
+import {setActiveTheme} from "../../src/Palette.js"
 
 let suite = new Suite("DisplayedToolbox");
 
@@ -214,6 +215,38 @@ suite.test("hintsFadeOutAsTheToolboxScrollsAway", () => {
     assertThat(inspector._hintVisibility()).isEqualTo(1);
     assertTrue(inspector.withToolboxScrolledBy(50)._hintVisibility() < 1);
     assertThat(inspector.withToolboxScrolledBy(200)._hintVisibility()).isEqualTo(0);
+});
+
+const nearWhitePixelCount = (canvas: HTMLCanvasElement): number => {
+    let data = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
+    let count = 0;
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235 && data[i + 3] > 200) {
+            count++;
+        }
+    }
+    return count;
+};
+
+suite.test("darkToolboxPaintsNoWhite", () => {
+    let box = toolbox();
+    let rect = box.gateDrawRect(0, 0);
+    let hand = Hand.EMPTY.withPos(rect.center());
+    let paintedNearWhitePixels = () => {
+        let canvas = document.createElement('canvas');
+        canvas.width = box.desiredWidth();
+        canvas.height = 600;
+        box.paint(new Painter(canvas), CircuitStats.EMPTY, hand);
+        return nearWhitePixelCount(canvas);
+    };
+
+    assertTrue(paintedNearWhitePixels() > 0);
+    setActiveTheme('dark');
+    try {
+        assertThat(paintedNearWhitePixels()).isEqualTo(0);
+    } finally {
+        setActiveTheme('light');
+    }
 });
 
 suite.test("circuitSitsBelowTheToolbox", () => {

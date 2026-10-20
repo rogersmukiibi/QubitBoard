@@ -14,10 +14,69 @@
  * limitations under the License.
  */
 
+import {activePalette} from "./Palette.js"
+
 /**
  * Configuration parameters for quantum circuit visualizer.
+ *
+ * The colors are getters onto the active theme's palette, so read them while drawing instead of keeping them.
  */
-class Config {}
+class Config {
+    // Backgrounds.
+    static get BACKGROUND_COLOR() { return activePalette().background; }
+    static get BACKGROUND_COLOR_CIRCUIT() { return activePalette().background; }
+    static get BACKGROUND_COLOR_TOOLBOX() { return activePalette().toolboxBackground; }
+
+    // Gate background colors.
+    static get GATE_FILL_COLOR() { return activePalette().gateFill; }
+    static get HIGHLIGHTED_GATE_FILL_COLOR() { return activePalette().gateHighlightFill; }
+    static get TIME_DEPENDENT_HIGHLIGHT_COLOR() { return activePalette().timeDependentFill; }
+    static get PERMUTATION_GATE_FILL_COLOR() { return activePalette().permutationFill; }
+    static get INPUT_GATE_FILL_COLOR() { return activePalette().inputGateFill; }
+    static get INPUT_GATE_STROKE_COLOR() { return activePalette().inputGateStroke; }
+    static get SET_DEFAULT_GATE_FILL_COLOR() { return activePalette().setDefaultFill; }
+
+    // Mixed-state displays are green.
+    static get DISPLAY_GATE_IN_TOOLBOX_FILL_COLOR() { return activePalette().displayToolboxFill; }
+    static get DISPLAY_GATE_BACK_COLOR() { return activePalette().displayBack; }
+    static get DISPLAY_GATE_FORE_COLOR() { return activePalette().displayFore; }
+
+    // Changes are yellow.
+    static get OPERATION_BACK_COLOR() { return activePalette().operationBack; }
+    static get OPERATION_FORE_COLOR() { return activePalette().operationFore; }
+
+    // Pure-state displays are cyan.
+    static get SUPERPOSITION_BACK_COLOR() { return activePalette().superpositionBack; }
+    static get SUPERPOSITION_MID_COLOR() { return activePalette().superpositionMid; }
+    static get SUPERPOSITION_FORE_COLOR() { return activePalette().superpositionFore; }
+
+    // Lines and text.
+    static get DEFAULT_FILL_COLOR() { return activePalette().background; }
+    static get DEFAULT_STROKE_COLOR() { return activePalette().stroke; }
+    static get DEFAULT_TEXT_COLOR() { return activePalette().text; }
+    static get SUBTLE_TEXT_COLOR() { return activePalette().subtleText; }
+    static get MUTED_TEXT_COLOR() { return activePalette().mutedText; }
+    /** Hints, warnings and NaN markers. */
+    static get ALERT_COLOR() { return activePalette().alert; }
+
+    // Details inside displays.
+    static get GRID_COLOR() { return activePalette().grid; }
+    static get FAINT_STROKE_COLOR() { return activePalette().faintStroke; }
+    static get LOG_CIRCLE_COLOR() { return activePalette().logCircle; }
+    static get LOG_HINT_COLOR() { return activePalette().logHint; }
+    static get BLOCH_GUIDE_COLOR() { return activePalette().blochGuide; }
+    static get BLOCH_ARROW_COLOR() { return activePalette().blochArrow; }
+    static get DENSITY_STROKE_COLOR() { return activePalette().densityStroke; }
+
+    // Tooltips, labels and controls drawn on the canvas.
+    static get TOOLTIP_BACK_COLOR() { return activePalette().tooltipBack; }
+    static get GATE_TITLE_COLOR() { return activePalette().gateTitle; }
+    static get LABEL_BACK_COLOR() { return activePalette().labelBack; }
+    static get SCROLL_BUTTON_FILL_COLOR() { return activePalette().scrollButtonFill; }
+    static get SCROLL_BUTTON_HOVER_FILL_COLOR() { return activePalette().scrollButtonHoverFill; }
+    static get SCROLL_BUTTON_EDGE_COLOR() { return activePalette().scrollButtonEdge; }
+    static get DRAG_HIGHLIGHT_COLOR() { return activePalette().dragHighlight; }
+}
 
 Config.EMPTY_CIRCUIT_TITLE = 'QubitBoard: Quantum Circuit Simulator';
 
@@ -32,25 +91,6 @@ Config.MIN_WIRE_COUNT = 2;
 Config.MIN_COL_COUNT = 5;
 Config.URL_CIRCUIT_PARAM_KEY = 'circuit';
 
-// Gate background colors.
-Config.GATE_FILL_COLOR = 'white';
-Config.HIGHLIGHTED_GATE_FILL_COLOR = '#FB7';
-Config.TIME_DEPENDENT_HIGHLIGHT_COLOR = '#FFC';
-
-// Mixed-state displays are green.
-Config.DISPLAY_GATE_IN_TOOLBOX_FILL_COLOR = '#4F4';
-Config.DISPLAY_GATE_BACK_COLOR = '#EFE';
-Config.DISPLAY_GATE_FORE_COLOR = '#3F3';
-
-// Changes are yellow.
-Config.OPERATION_BACK_COLOR = '#FFE';
-Config.OPERATION_FORE_COLOR = '#FF0';
-
-// Pure-state displays are cyan.
-Config.SUPERPOSITION_BACK_COLOR = '#EFF';
-Config.SUPERPOSITION_MID_COLOR = '#8FF';
-Config.SUPERPOSITION_FORE_COLOR = '#0BB';
-
 // Time constants.
 Config.CYCLE_DURATION_MS = 8000; // How long it takes for evolving gates to cycle, in milliseconds.
 Config.TIME_CACHE_GRANULARITY = 196; // The number of buckets the cycle is divided into.
@@ -61,11 +101,7 @@ Config.REDRAW_COOLDOWN_MILLIS = 10; // Milliseconds. Rate-limit on redraws. Long
 Config.GATE_RADIUS = 20;
 Config.WIRE_SPACING = 50;
 
-Config.BACKGROUND_COLOR = 'white';
-Config.BACKGROUND_COLOR_CIRCUIT = 'white';
-
 // Toolbox layout.
-Config.BACKGROUND_COLOR_TOOLBOX = '#CCC';
 Config.TOOLBOX_GATE_SPACING = 2;
 Config.TOOLBOX_GROUP_SPACING = 24 - Config.TOOLBOX_GATE_SPACING;
 Config.TOOLBOX_GATE_SPAN = Config.GATE_RADIUS * 2 + Config.TOOLBOX_GATE_SPACING;
@@ -83,9 +119,6 @@ Config.MINIMUM_CANVAS_HEIGHT = 400;
 Config.SUPPRESSED_GLSL_WARNING_PATTERNS = [];
 
 // Draw constants.
-Config.DEFAULT_FILL_COLOR = 'white';
-Config.DEFAULT_STROKE_COLOR = 'black';
-Config.DEFAULT_TEXT_COLOR = 'black';
 Config.DEFAULT_FONT_SIZE = 12;
 Config.DEFAULT_FONT_FAMILY = 'sans-serif';
 Config.DEFAULT_STROKE_THICKNESS = 1;

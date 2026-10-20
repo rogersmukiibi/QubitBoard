@@ -319,18 +319,18 @@ class DisplayedToolbox {
                 continue;
             }
             let hovered = hand.pos !== undefined && rect.containsPoint(hand.pos);
-            painter.fillRect(rect, hovered ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)');
+            painter.fillRect(rect, hovered ? Config.SCROLL_BUTTON_HOVER_FILL_COLOR : Config.SCROLL_BUTTON_FILL_COLOR);
             painter.strokeLine(
                 new Point(direction < 0 ? rect.right() : rect.x, rect.y),
                 new Point(direction < 0 ? rect.right() : rect.x, rect.bottom()),
-                '#999');
+                Config.SCROLL_BUTTON_EDGE_COLOR);
             painter.print(
                 direction < 0 ? '‹' : '›',
                 rect.center().x,
                 rect.center().y,
                 'center',
                 'middle',
-                'black',
+                Config.DEFAULT_TEXT_COLOR,
                 '32px sans-serif',
                 rect.w,
                 rect.h);
@@ -353,7 +353,7 @@ class DisplayedToolbox {
         painter.ctx.save();
         painter.ctx.translate(x, y);
         painter.ctx.rotate(-Math.PI/2);
-        painter.printLine(this.name, new Rect(-r.h / 2, -r.w / 2, r.h, r.w), 0.5, 'black', 24);
+        painter.printLine(this.name, new Rect(-r.h / 2, -r.w / 2, r.h, r.w), 0.5, Config.DEFAULT_TEXT_COLOR, 24);
         painter.ctx.restore();
     }
 
@@ -402,7 +402,7 @@ class DisplayedToolbox {
             r.y + r.h/2,
             'center',
             'middle',
-            'black',
+            Config.DEFAULT_TEXT_COLOR,
             '16px sans-serif',
             r.w,
             r.h);

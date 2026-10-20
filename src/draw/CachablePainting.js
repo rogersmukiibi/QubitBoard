@@ -16,6 +16,7 @@
 
 import {Painter} from "./Painter.js"
 import {RestartableRng} from "../base/RestartableRng.js"
+import {paletteVersion} from "../Palette.js"
 
 const fixedRng = new RestartableRng();
 
@@ -40,6 +41,11 @@ class CachablePainting {
          * @private
          */
         this._cachedCanvases = new Map();
+        /**
+         * @type {!number}
+         * @private
+         */
+        this._cachedPaletteVersion = paletteVersion();
     }
 
     /**
@@ -49,6 +55,10 @@ class CachablePainting {
      * @param {!*=} key
      */
     paint(x, y, painter, key=undefined) {
+        if (this._cachedPaletteVersion !== paletteVersion()) {
+            this._cachedCanvases.clear();
+            this._cachedPaletteVersion = paletteVersion();
+        }
         if (!this._cachedCanvases.has(key)) {
             let canvas = /** @type {!HTMLCanvasElement} */ document.createElement('canvas');
             let {width, height} = this.sizeFunc(key);

@@ -1,13 +1,91 @@
 <div id="code-panel" class="qb-code-panel" style="display: none">
     <style>
         .qb-code-panel {
+            --qb-code-bg: #fff;
+            --qb-code-border: #bbb;
+            --qb-code-shadow: rgba(0, 0, 0, 0.08);
+            --qb-code-hint: #888;
+            --qb-code-dirty: #a66b00;
+            --qb-code-error: #c00;
+            --qb-code-divider: #ddd;
+            --qb-code-body-bg: #fafafa;
+            --qb-code-gutter-fg: #999;
+            --qb-code-gutter-bg: #f0f0f0;
+            --qb-code-error-mark: #d33;
+            --qb-code-text: #222;
+            --qb-code-caret: #000;
+            --qb-code-selection: rgba(0, 120, 215, 0.25);
+            --qb-code-error-line-bg: rgba(221, 51, 51, 0.08);
+            --qb-tok-cm: #8a8a8a;
+            --qb-tok-pragma: #7a4fb0;
+            --qb-tok-kw: #0033b3;
+            --qb-tok-ctl: #a0522d;
+            --qb-tok-wire: #067d17;
+            --qb-tok-arg: #b35900;
+            --qb-tok-num: #1750eb;
+            --qb-tok-str: #8c6c00;
+        }
+        /* Keep the two dark blocks the same. */
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .qb-code-panel {
+                --qb-code-bg: #1f1f22;
+                --qb-code-border: #3a3a40;
+                --qb-code-shadow: rgba(0, 0, 0, 0.4);
+                --qb-code-hint: #9a9aa2;
+                --qb-code-dirty: #e0a040;
+                --qb-code-error: #ff6b6b;
+                --qb-code-divider: #333338;
+                --qb-code-body-bg: #1b1b1d;
+                --qb-code-gutter-fg: #77777f;
+                --qb-code-gutter-bg: #232327;
+                --qb-code-error-mark: #e05555;
+                --qb-code-text: #dcdcdf;
+                --qb-code-caret: #fff;
+                --qb-code-selection: rgba(80, 150, 230, 0.35);
+                --qb-code-error-line-bg: rgba(255, 90, 90, 0.12);
+                --qb-tok-cm: #7f848e;
+                --qb-tok-pragma: #c49be8;
+                --qb-tok-kw: #6cb6ff;
+                --qb-tok-ctl: #e5a06a;
+                --qb-tok-wire: #7ccf83;
+                --qb-tok-arg: #f0a35c;
+                --qb-tok-num: #79b8ff;
+                --qb-tok-str: #d9c26a;
+            }
+        }
+        :root[data-theme="dark"] .qb-code-panel {
+            --qb-code-bg: #1f1f22;
+            --qb-code-border: #3a3a40;
+            --qb-code-shadow: rgba(0, 0, 0, 0.4);
+            --qb-code-hint: #9a9aa2;
+            --qb-code-dirty: #e0a040;
+            --qb-code-error: #ff6b6b;
+            --qb-code-divider: #333338;
+            --qb-code-body-bg: #1b1b1d;
+            --qb-code-gutter-fg: #77777f;
+            --qb-code-gutter-bg: #232327;
+            --qb-code-error-mark: #e05555;
+            --qb-code-text: #dcdcdf;
+            --qb-code-caret: #fff;
+            --qb-code-selection: rgba(80, 150, 230, 0.35);
+            --qb-code-error-line-bg: rgba(255, 90, 90, 0.12);
+            --qb-tok-cm: #7f848e;
+            --qb-tok-pragma: #c49be8;
+            --qb-tok-kw: #6cb6ff;
+            --qb-tok-ctl: #e5a06a;
+            --qb-tok-wire: #7ccf83;
+            --qb-tok-arg: #f0a35c;
+            --qb-tok-num: #79b8ff;
+            --qb-tok-str: #d9c26a;
+        }
+        .qb-code-panel {
             position: fixed;
             left: 0;
             right: 0;
             bottom: 0;
-            background: #fff;
-            border-top: 1px solid #bbb;
-            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.08);
+            background: var(--qb-code-bg);
+            border-top: 1px solid var(--qb-code-border);
+            box-shadow: 0 -2px 6px var(--qb-code-shadow);
             font-family: sans-serif;
             font-size: 13px;
         }
@@ -33,7 +111,7 @@
             text-align: left;
         }
         .qb-code-hint {
-            color: #888;
+            color: var(--qb-code-hint);
         }
         .qb-code-status {
             margin-left: auto;
@@ -42,13 +120,13 @@
             text-overflow: ellipsis;
             max-width: 100%;
         }
-        .qb-code-status-synced { color: #888; }
-        .qb-code-status-dirty { color: #a66b00; }
-        .qb-code-status-error { color: #c00; font-weight: bold; }
+        .qb-code-status-synced { color: var(--qb-code-hint); }
+        .qb-code-status-dirty { color: var(--qb-code-dirty); }
+        .qb-code-status-error { color: var(--qb-code-error); font-weight: bold; }
         .qb-code-body {
             display: flex;
-            border-top: 1px solid #ddd;
-            background: #fafafa;
+            border-top: 1px solid var(--qb-code-divider);
+            background: var(--qb-code-body-bg);
         }
         .qb-code-gutter,
         .qb-code-highlight,
@@ -64,14 +142,14 @@
             padding: 6px 6px 6px 4px;
             overflow: hidden;
             text-align: right;
-            color: #999;
-            background: #f0f0f0;
-            border-right: 1px solid #ddd;
+            color: var(--qb-code-gutter-fg);
+            background: var(--qb-code-gutter-bg);
+            border-right: 1px solid var(--qb-code-divider);
             user-select: none;
         }
         .qb-code-error-number {
             color: #fff;
-            background: #d33;
+            background: var(--qb-code-error-mark);
             border-radius: 2px;
         }
         .qb-code-scroll {
@@ -95,31 +173,31 @@
         }
         .qb-code-highlight {
             overflow: hidden;
-            color: #222;
+            color: var(--qb-code-text);
             pointer-events: none;
         }
         .qb-code-text {
             color: transparent;
             background: transparent;
-            caret-color: #000;
+            caret-color: var(--qb-code-caret);
             resize: none;
             outline: none;
         }
         .qb-code-text::selection {
-            background: rgba(0, 120, 215, 0.25);
+            background: var(--qb-code-selection);
         }
         .qb-code-error-line {
-            text-decoration: underline wavy #d33;
-            background: rgba(221, 51, 51, 0.08);
+            text-decoration: underline wavy var(--qb-code-error-mark);
+            background: var(--qb-code-error-line-bg);
         }
-        .qb-tok-cm { color: #8a8a8a; font-style: italic; }
-        .qb-tok-pragma { color: #7a4fb0; }
-        .qb-tok-kw { color: #0033b3; font-weight: bold; }
-        .qb-tok-ctl { color: #a0522d; }
-        .qb-tok-wire { color: #067d17; }
-        .qb-tok-arg { color: #b35900; }
-        .qb-tok-num { color: #1750eb; }
-        .qb-tok-str { color: #8c6c00; }
+        .qb-tok-cm { color: var(--qb-tok-cm); font-style: italic; }
+        .qb-tok-pragma { color: var(--qb-tok-pragma); }
+        .qb-tok-kw { color: var(--qb-tok-kw); font-weight: bold; }
+        .qb-tok-ctl { color: var(--qb-tok-ctl); }
+        .qb-tok-wire { color: var(--qb-tok-wire); }
+        .qb-tok-arg { color: var(--qb-tok-arg); }
+        .qb-tok-num { color: var(--qb-tok-num); }
+        .qb-tok-str { color: var(--qb-tok-str); }
     </style>
     <div id="code-panel-resize" class="qb-code-resize" title="Drag to resize"></div>
     <div class="qb-code-header">
