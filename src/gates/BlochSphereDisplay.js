@@ -80,7 +80,7 @@ function _paintBlochSphereDisplay_indicator(
     let r = 3.8 / (1 + x / 6);
 
     // Draw state indicators (in not-quite-correct 3d).
-    painter.strokeLine(c, p, 'black', 1.5);
+    painter.strokeLine(c, p, Config.DEFAULT_STROKE_COLOR, 1.5);
     painter.fillCircle(p, r, fillColor);
 
     painter.ctx.save();
@@ -93,7 +93,7 @@ function _paintBlochSphereDisplay_indicator(
     // Show depth by lerping the line from overlaying to being overlayd by the ball.
     painter.ctx.save();
     painter.ctx.globalAlpha *= Math.min(1, Math.max(0, 0.5+x*5));
-    painter.strokeLine(c, p, 'black', 2);
+    painter.strokeLine(c, p, Config.DEFAULT_STROKE_COLOR, 2);
     painter.ctx.restore();
 }
 
@@ -125,11 +125,11 @@ function paintBlochSphereDisplay(
         for (let d of [dx, dy, dz]) {
             trace.line(c.x - d.x, c.y - d.y, c.x + d.x, c.y + d.y);
         }
-    }).thenStroke('#BBB');
+    }).thenStroke(Config.FAINT_STROKE_COLOR);
 
     let [x, y, z] = [NaN, NaN, NaN];
     if (qubitDensityMatrix.hasNaN()) {
-        painter.printParagraph("NaN", drawArea, new Point(0.5, 0.5), 'red');
+        painter.printParagraph("NaN", drawArea, new Point(0.5, 0.5), Config.ALERT_COLOR);
     } else {
         [x, y, z] = qubitDensityMatrix.qubitDensityMatrixToBlochVector();
         _paintBlochSphereDisplay_indicator(painter, x, y, z, drawArea, fillColor);

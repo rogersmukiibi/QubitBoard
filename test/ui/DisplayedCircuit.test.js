@@ -24,6 +24,7 @@ import {Point} from "../../src/math/Point.js"
 import {RestartableRng} from "../../src/base/RestartableRng.js"
 import {Hand} from "../../src/ui/Hand.js"
 import {Painter} from "../../src/draw/Painter.js"
+import {setActiveTheme} from "../../src/Palette.js"
 
 const COMMON_GATES = new Map([
     ['X', Gates.HalfTurns.X],
@@ -243,6 +244,58 @@ suite.testUsingWebGL("drawCircuitCompletes_QuantumTeleportation", () => {
     let inputState = stats.qubitDensityMatrix(7, 0);
     let outputState = stats.qubitDensityMatrix(Infinity, 2);
     assertThat(outputState).isApproximatelyEqualTo(inputState);
+});
+
+suite.testUsingWebGL("darkCircuitPaintsNoWhite", () => {
+    let circuit = CircuitDefinition.fromTextDiagram(
+        new Map([
+            ['X', Gates.HalfTurns.X],
+            ['H', Gates.HalfTurns.H],
+            ['M', Gates.Special.Measurement],
+            ['•', Gates.Controls.Control],
+            ['◦', Gates.Controls.AntiControl],
+            ['%', Gates.Displays.ProbabilityDisplayFamily],
+            ['@', Gates.Displays.BlochSphereDisplay],
+            ['a', Gates.Displays.AmplitudeDisplayFamily],
+            ['d', Gates.Displays.DensityMatrixDisplayFamily],
+            ['s', Gates.Displays.SampleDisplayFamily],
+            ['i', Gates.InputGates.InputAFamily],
+            ['c', Gates.CountingGates.CountingFamily],
+            ['z', Gates.Detectors.ZDetector],
+            ['p', Gates.PostSelectionGates.PostSelectOn],
+            ['r', Gates.CycleBitsGates.CycleBitsFamily],
+            ['x', Gates.Special.SwapHalf],
+            ['…', Gates.SpacerGate],
+            ['-', undefined],
+            ['/', null]
+        ]),
+        `H•%adsiczrx…M
+         -◦@/////-/x--
+         X-------p/---`);
+    let stats = CircuitStats.fromCircuitAtTime(circuit, 0.3);
+    let displayed = DisplayedCircuit.empty(0).withCircuit(circuit);
+    let paintedNearWhitePixels = () => {
+        let canvas = /** @type {HTMLCanvasElement} */ document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 400;
+        displayed.paint(new Painter(canvas, new RestartableRng()), Hand.EMPTY, stats);
+        let data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+        let count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235 && data[i + 3] > 200) {
+                count++;
+            }
+        }
+        return count;
+    };
+
+    assertThat(paintedNearWhitePixels() > 0).isEqualTo(true);
+    setActiveTheme('dark');
+    try {
+        assertThat(paintedNearWhitePixels()).isEqualTo(0);
+    } finally {
+        setActiveTheme('light');
+    }
 });
 
 suite.test("dragXIntoCNot", () => {

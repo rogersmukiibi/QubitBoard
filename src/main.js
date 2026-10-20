@@ -41,6 +41,7 @@ import {initMenu, obsMenuIsShowing, closeMenu} from "./ui/menu.js"
 import {initUndoRedo} from "./ui/undo.js"
 import {initClear} from "./ui/clear.js"
 import {initCodePanel} from "./ui/codePanel.js"
+import {initTheme} from "./ui/theme.js"
 import {initUrlCircuitSync} from "./ui/url.js"
 import {initTitleSync} from "./ui/title.js"
 import {simulate} from "./ui/sim.js"
@@ -324,6 +325,9 @@ initClear(revision, obsIsAnyOverlayShowing.observable());
 initMenu(revision, obsIsAnyOverlayShowing.observable());
 initTitleSync(revision);
 initCodePanel(revision, obsIsAnyOverlayShowing.observable());
+initTheme(
+    /** @type {!HTMLButtonElement} */ document.getElementById('theme-button'),
+    () => redrawThrottle.trigger());
 obsForgeIsShowing.
     zipLatest(obsExportsIsShowing, (e1, e2) => e1 || e2).
     zipLatest(obsMenuIsShowing, (e1, e2) => e1 || e2).

@@ -1,7 +1,7 @@
 <div id="gate-forge-div" style="display:none">
     <div id="gate-forge-overlay" style="position:fixed; left: 0; top: 0; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.7);">
     </div>
-    <div style="position: absolute; top: 20px; left: 50px; padding: 20px; background-color: white; border: 1px solid black;">
+    <div style="position: absolute; top: 20px; left: 50px; padding: 20px; background-color: var(--qb-dialog-bg); border: 1px solid var(--qb-border);">
         <style scoped>
             th {
                 font-size: 20px;
@@ -9,11 +9,11 @@
         </style>
         <table cellspacing="0">
             <colgroup>
-                <col style="background-color:#EEE;"/>
+                <col style="background-color:var(--qb-column-bg);"/>
                 <col/>
-                <col style="background-color:#EEE;"/>
+                <col style="background-color:var(--qb-column-bg);"/>
                 <col/>
-                <col style="background-color:#EEE;"/>
+                <col style="background-color:var(--qb-column-bg);"/>
             </colgroup>
             <tr>
                 <th>From Rotation</th>
@@ -33,7 +33,7 @@
                     <style scoped>
                         input[id="gate-forge-matrix-fix"]:not(:checked) + label {
                             font-weight: bold;
-                            background-color: pink;
+                            background-color: var(--qb-attention-bg);
                         }
                     </style>
 
@@ -52,15 +52,15 @@
             </tr>
             <tr>
                 <td>
-                    <canvas id="gate-forge-rotation-canvas" style="border:1px black solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
+                    <canvas id="gate-forge-rotation-canvas" style="border:1px var(--qb-border) solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
                 </td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>OR</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td>
-                    <canvas id="gate-forge-matrix-canvas" style="border:1px black solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
+                    <canvas id="gate-forge-matrix-canvas" style="border:1px var(--qb-border) solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
                 </td>
                 <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>OR</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td>
-                    <canvas id="gate-forge-circuit-canvas" style="border:1px black solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
+                    <canvas id="gate-forge-circuit-canvas" style="border:1px var(--qb-border) solid;width:195px;height:100px;margin:10px 0 0 0;"></canvas>
                 </td>
             </tr>
             <tr>

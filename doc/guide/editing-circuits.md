@@ -78,6 +78,17 @@ You can drag entire rows of gates by holding the *control* key and then dragging
 Edits you have made to the circuit can be reverted by hitting the "Undo" button above the editing area, or by hitting Control+Z.
 If you undo too many times, you can redo edits by hitting the "Redo" button, or by hitting Control+Shift+Z or by hitting Control+Y.
 
+## Light and dark colors
+
+The "Theme" button above the editing area cycles through three settings:
+
+- **Auto** (the default) follows your system's light or dark setting, and switches when the system does.
+- **Light** always uses the original colors.
+- **Dark** always uses dark colors, for the circuit, the toolbox, the menus and the code panel.
+
+QubitBoard remembers the setting in your browser. The colors don't change how a circuit is simulated, and they are not
+part of circuit links or exported copies.
+
 ## Writing circuits as code
 
 You can also build a circuit by typing it into the code panel at the bottom of the page.

@@ -121,5 +121,9 @@ Set `PUPPETEER_NO_SANDBOX=1` when Chromium's sandbox is unavailable (containers,
 - Match the style of the surrounding code: 4-space indentation, type annotations on public methods (JSDoc in `.js`
   files, TypeScript types in `.ts` files), and immutable value classes with `isEqualTo` and `toString`.
 - Keep comments sparse. Don't add comments that restate the code.
+- Canvas colors come from the light and dark palettes in `src/Palette.ts`, through the color getters on `Config`. Read
+  them while drawing, not when a module loads, or the color stays fixed when the theme changes, and don't write color
+  literals in drawing code. Page colors are CSS variables in `html/`. `darkToolboxPaintsNoWhite` and
+  `darkCircuitPaintsNoWhite` fail when a light color leaks into dark mode.
 - Wire ordering: the top wire is the low bit, and kets are big-endian. See `doc/reference/conventions.md` for the
   user-facing conventions.

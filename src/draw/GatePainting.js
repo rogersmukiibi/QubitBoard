@@ -34,7 +34,7 @@ GatePainting.paintOutline = args => {
         args.painter.strokeLine(r.topRight(), r.bottomRight());
         args.painter.strokeLine(r.bottomLeft(), r.bottomRight());
     }
-    args.painter.strokeRect(args.rect, 'black');
+    args.painter.strokeRect(args.rect, Config.DEFAULT_STROKE_COLOR);
 };
 
 GatePainting.paintBackground =
@@ -62,12 +62,12 @@ GatePainting.LABEL_DRAWER = args => {
 };
 
 /**
- * @param {!string=} toolboxFillColor
- * @param {!string=} normalFillColor
+ * @param {undefined|!string=} toolboxFillColor Defaults to the gate fill color, looked up when drawing.
+ * @param {undefined|!string=} normalFillColor Defaults to the gate fill color, looked up when drawing.
  * @constructor
  */
 GatePainting.MAKE_HIGHLIGHTED_DRAWER =
-    (toolboxFillColor = Config.GATE_FILL_COLOR, normalFillColor = Config.GATE_FILL_COLOR) => args => {
+    (toolboxFillColor = undefined, normalFillColor = undefined) => args => {
         GatePainting.paintBackground(args, toolboxFillColor, normalFillColor);
         GatePainting.paintOutline(args);
         GatePainting.paintResizeTab(args);
@@ -101,11 +101,11 @@ GatePainting.paintResizeTab = args => {
     let trimRect = rect.skipLeft(2).skipRight(2);
     let {x: cx, y: cy} = trimRect.center();
     let backColor = args.isResizeHighlighted ? Config.HIGHLIGHTED_GATE_FILL_COLOR : Config.GATE_FILL_COLOR;
-    let foreColor = args.isResizeHighlighted ? '#222' : 'gray';
+    let foreColor = args.isResizeHighlighted ? Config.DEFAULT_TEXT_COLOR : Config.SUBTLE_TEXT_COLOR;
     args.painter.ctx.save();
     args.painter.ctx.globalAlpha *= args.isResizeHighlighted ? 1 : 0.7;
     args.painter.fillRect(trimRect, backColor);
-    args.painter.strokeRect(trimRect, 'gray');
+    args.painter.strokeRect(trimRect, Config.SUBTLE_TEXT_COLOR);
     args.painter.ctx.restore();
     args.painter.print('resize', cx, cy, 'center', 'middle', foreColor, 'monospace', trimRect.w - 4, trimRect.h - 4);
     args.painter.trace(tracer => {
@@ -148,7 +148,7 @@ GatePainting.paintGateSymbol = (args, symbolOverride=undefined, allowExponent=tr
             rect.y + rect.h/2 + offsetY,
             'center',
             'middle',
-            'black',
+            Config.DEFAULT_TEXT_COLOR,
             GATE_SYMBOL_FONT,
             rect.w,
             rect.h);
@@ -169,7 +169,7 @@ GatePainting.paintGateSymbol = (args, symbolOverride=undefined, allowExponent=tr
         rect.y + rect.h/2 + offsetY,
         'right',
         'hanging',
-        'black',
+        Config.DEFAULT_TEXT_COLOR,
         GATE_SYMBOL_FONT,
         divider,
         rect.h);
@@ -179,7 +179,7 @@ GatePainting.paintGateSymbol = (args, symbolOverride=undefined, allowExponent=tr
         rect.y + rect.h/2 + offsetY,
         'left',
         'alphabetic',
-        'black',
+        Config.DEFAULT_TEXT_COLOR,
         GATE_SYMBOL_FONT,
         rect.w - divider,
         rect.h);
@@ -202,7 +202,7 @@ function _paintSymbolHandleLines(painter, symbol, rect) {
             rect.y + rect.h/2 + 9*i,
             'center',
             'hanging',
-            'black',
+            Config.DEFAULT_TEXT_COLOR,
             GATE_SYMBOL_FONT,
             rect.w,
             16);
@@ -251,11 +251,11 @@ GatePainting.paintLocationIndependentFrame = (args,
     let backColor = args.isHighlighted ? Config.HIGHLIGHTED_GATE_FILL_COLOR : normalFillColor;
     args.painter.trace(tracer => GatePainting.traceLocationIndependentOutline(args, tracer)).
     thenFill(backColor).
-    thenStroke('black');
+    thenStroke(Config.DEFAULT_STROKE_COLOR);
 };
 
 /**
- * @param {!string} normalFillColor
+ * @param {undefined|!string=} normalFillColor Defaults to the gate fill color, looked up when drawing.
  * @returns {!function(!GateDrawParams)}
  */
 GatePainting.makeLocationIndependentGateDrawer = normalFillColor => args => {
@@ -266,7 +266,7 @@ GatePainting.makeLocationIndependentGateDrawer = normalFillColor => args => {
 /**
  * @param {!GateDrawParams} args
  */
-GatePainting.LOCATION_INDEPENDENT_GATE_DRAWER = GatePainting.makeLocationIndependentGateDrawer(Config.GATE_FILL_COLOR);
+GatePainting.LOCATION_INDEPENDENT_GATE_DRAWER = GatePainting.makeLocationIndependentGateDrawer();
 
 /**
  * @param {!Array.<!string>} labels
@@ -288,7 +288,7 @@ GatePainting.SECTIONED_DRAWER_MAKER = (labels, dividers) => args => {
         if (i < labels.length - 1) {
             p2 = p + dividers[i];
             let cy = args.rect.y + args.rect.h*p2;
-            args.painter.strokeLine(new Point(args.rect.x, cy), new Point(args.rect.right(), cy), '#BBB');
+            args.painter.strokeLine(new Point(args.rect.x, cy), new Point(args.rect.right(), cy), Config.FAINT_STROKE_COLOR);
         } else {
             p2 = 1;
         }
@@ -298,7 +298,7 @@ GatePainting.SECTIONED_DRAWER_MAKER = (labels, dividers) => args => {
             args.rect.y + args.rect.h*(p + p2)/2,
             'center',
             'middle',
-            'black',
+            Config.DEFAULT_TEXT_COLOR,
             font,
             args.rect.w-2,
             args.rect.h*(p2-p));
@@ -308,7 +308,8 @@ GatePainting.SECTIONED_DRAWER_MAKER = (labels, dividers) => args => {
     GatePainting.paintResizeTab(args);
 };
 
-const DISPLAY_GATE_DEFAULT_DRAWER = GatePainting.MAKE_HIGHLIGHTED_DRAWER(Config.DISPLAY_GATE_IN_TOOLBOX_FILL_COLOR);
+const DISPLAY_GATE_DEFAULT_DRAWER = args =>
+    GatePainting.MAKE_HIGHLIGHTED_DRAWER(Config.DISPLAY_GATE_IN_TOOLBOX_FILL_COLOR)(args);
 
 GatePainting.makeDisplayDrawer = statePainter => args => {
     if (args.positionInCircuit === undefined) {
@@ -321,7 +322,7 @@ GatePainting.makeDisplayDrawer = statePainter => args => {
     statePainter(args);
 
     if (args.isHighlighted) {
-        args.painter.strokeRect(args.rect, 'black', 1.5);
+        args.painter.strokeRect(args.rect, Config.DEFAULT_STROKE_COLOR, 1.5);
     }
 
     args.painter.ctx.save();
@@ -346,7 +347,7 @@ GatePainting.MATRIX_DRAWER = args => {
         m,
         args.rect,
         Config.OPERATION_FORE_COLOR,
-        'black',
+        Config.DEFAULT_STROKE_COLOR,
         undefined,
         Config.OPERATION_BACK_COLOR,
         undefined,
@@ -393,7 +394,7 @@ GatePainting.paintCycleState = (args, angle, xScale=1, yScale=1, zeroAngle=0) =>
     args.painter.ctx.translate(c.x, c.y);
     args.painter.ctx.scale(-xScale, -yScale);
     args.painter.ctx.rotate(zeroAngle);
-    args.painter.ctx.strokeStyle = 'black';
+    args.painter.ctx.strokeStyle = Config.DEFAULT_STROKE_COLOR;
     args.painter.ctx.fillStyle = 'yellow';
     args.painter.ctx.globalAlpha *= 0.4;
 
@@ -479,10 +480,10 @@ function _eraseWiresForPermutation(args) {
         let isMeasured2 = args.stats.circuitDefinition.locIsMeasured(loc.offsetBy(1, 0));
 
         for (let dy of isMeasured1 ? [-1, +1] : [0]) {
-            args.painter.strokeLine(p.offsetBy(0, dy), c.offsetBy(1, dy), 'white');
+            args.painter.strokeLine(p.offsetBy(0, dy), c.offsetBy(1, dy), Config.BACKGROUND_COLOR_CIRCUIT);
         }
         for (let dy of isMeasured2 ? [-1, +1] : [0]) {
-            args.painter.strokeLine(c.offsetBy(-1, dy), q.offsetBy(0, dy), 'white');
+            args.painter.strokeLine(c.offsetBy(-1, dy), q.offsetBy(0, dy), Config.BACKGROUND_COLOR_CIRCUIT);
         }
     }
 }
@@ -500,7 +501,7 @@ GatePainting.PERMUTATION_DRAWER = args => {
     if (args.isHighlighted ||
             args.isResizeHighlighted ||
             args.stats.circuitDefinition.colHasControls(args.positionInCircuit.col)) {
-        GatePainting.paintBackground(args, '#F3F3F3', '#F3F3F3');
+        GatePainting.paintBackground(args, Config.PERMUTATION_GATE_FILL_COLOR, Config.PERMUTATION_GATE_FILL_COLOR);
         GatePainting.paintOutline(args);
         GatePainting.paintResizeTab(args);
     } else {
@@ -510,7 +511,7 @@ GatePainting.PERMUTATION_DRAWER = args => {
     // Draw wires.
     let x1 = args.rect.x;
     let x2 = args.rect.right();
-    args.painter.ctx.strokeStyle = 'black';
+    args.painter.ctx.strokeStyle = Config.DEFAULT_STROKE_COLOR;
     for (let i = 0; i < args.gate.height; i++) {
         let j = args.gate.knownBitPermutationFunc(i);
 

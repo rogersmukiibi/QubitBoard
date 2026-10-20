@@ -15,6 +15,7 @@
  */
 
 import {Config} from "../Config.js"
+import {withAlpha} from "../Palette.js"
 import {CircuitShaders} from "../circuit/CircuitShaders.js"
 import {Gate} from "../circuit/Gate.js"
 import {GatePainting} from "../draw/GatePainting.js"
@@ -255,10 +256,10 @@ const AMPLITUDE_DRAWER_FROM_CUSTOM_STATS = GatePainting.makeDisplayDrawer(args =
         matrix,
         drawRect,
         Config.SUPERPOSITION_MID_COLOR,
-        'black',
+        Config.DEFAULT_STROKE_COLOR,
         Config.SUPERPOSITION_FORE_COLOR,
         Config.SUPERPOSITION_BACK_COLOR,
-        `rgba(0, 0, 0, ${indicatorAlpha})`);
+        withAlpha(Config.DEFAULT_STROKE_COLOR, indicatorAlpha));
 
     let forceSign = v => (v >= 0 ? '+' : '') + v.toFixed(2);
     if (isIncoherent) {
@@ -281,7 +282,7 @@ const AMPLITUDE_DRAWER_FROM_CUSTOM_STATS = GatePainting.makeDisplayDrawer(args =
             args.painter.strokeLine(
                 new Point(cx, cy),
                 new Point(cx + cw/2, cy),
-                `rgba(255,0,0,${indicatorAlpha})`,
+                withAlpha(Config.ALERT_COLOR, indicatorAlpha),
                 2);
             args.painter.print(
                 'fixed',
@@ -289,7 +290,7 @@ const AMPLITUDE_DRAWER_FROM_CUSTOM_STATS = GatePainting.makeDisplayDrawer(args =
                 cy,
                 'right',
                 'bottom',
-                `rgba(255,0,0,${indicatorAlpha})`,
+                withAlpha(Config.ALERT_COLOR, indicatorAlpha),
                 '12px monospace',
                 cw*0.5,
                 rh*0.5);
@@ -321,7 +322,7 @@ function paintErrorIfPresent(args, indicatorAlpha) {
             args.rect.y+args.rect.h,
             'center',
             'hanging',
-            `rgba(255,0,0,${1-indicatorAlpha})`,
+            withAlpha(Config.ALERT_COLOR, 1-indicatorAlpha),
             '12px sans-serif',
             args.rect.w,
             args.rect.h,

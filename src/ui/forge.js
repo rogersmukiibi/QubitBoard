@@ -85,15 +85,15 @@ function initForge(revision, obsIsAnyOverlayShowing) {
                 op,
                 rect1,
                 Config.OPERATION_FORE_COLOR,
-                'black',
+                Config.DEFAULT_STROKE_COLOR,
                 undefined,
                 Config.OPERATION_BACK_COLOR,
                 undefined,
                 'transparent');
             if (!op.isUnitary(0.009)) {
-                painter.printParagraph('NOT UNITARY', rect2, new Point(0.5, 0.5), 'red', 24);
+                painter.printParagraph('NOT UNITARY', rect2, new Point(0.5, 0.5), Config.ALERT_COLOR, 24);
             } else  if (op.width() !== 2) {
-                painter.printParagraph('(Not a 1-qubit rotation)', rect2, new Point(0.5, 0.5), '#666', 20);
+                painter.printParagraph('(Not a 1-qubit rotation)', rect2, new Point(0.5, 0.5), Config.MUTED_TEXT_COLOR, 20);
             } else {
                 MathPainter.paintBlochSphereRotation(
                     painter,
@@ -103,7 +103,7 @@ function initForge(revision, obsIsAnyOverlayShowing) {
                     Config.OPERATION_FORE_COLOR);
             }
             let cx = (rect1.right() + rect2.x)/2;
-            painter.strokeLine(new Point(cx, 0), new Point(cx, canvas.height), 'black', 2);
+            painter.strokeLine(new Point(cx, 0), new Point(cx, canvas.height), Config.DEFAULT_STROKE_COLOR, 2);
             if (!op.hasNaN()) {
                 button.disabled = false;
             }
@@ -112,7 +112,7 @@ function initForge(revision, obsIsAnyOverlayShowing) {
                 ex+"",
                 new Rect(0, 0, canvas.width, canvas.height),
                 new Point(0.5, 0.5),
-                'red',
+                Config.ALERT_COLOR,
                 24);
         }
     }
@@ -276,7 +276,7 @@ function initForge(revision, obsIsAnyOverlayShowing) {
                     ex+"",
                     new Rect(0, 0, circuitCanvas.width, circuitCanvas.height),
                     new Point(0.5, 0.5),
-                    'red',
+                    Config.ALERT_COLOR,
                     24);
             }
         };

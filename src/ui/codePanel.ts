@@ -17,6 +17,7 @@
 import {CODE_LANGUAGES, findCodeLanguage} from "../code/Languages.js"
 import {CodeEditor} from "./CodeEditor.js"
 import {CodeError} from "../code/CodeError.js"
+import {loadSetting, saveSetting} from "../browser/Settings.js"
 import type {Observable} from "../base/Obs.js"
 import type {Revision} from "../base/Revision.js"
 
@@ -25,23 +26,6 @@ const STORAGE_KEY_HEIGHT = 'qubitboard.codePanel.height';
 const STORAGE_KEY_COLLAPSED = 'qubitboard.codePanel.collapsed';
 const MIN_BODY_HEIGHT = 60;
 const DEFAULT_BODY_HEIGHT = 220;
-
-function loadSetting(key: string): string | undefined {
-    try {
-        let v = window.localStorage.getItem(key);
-        return v === null ? undefined : v;
-    } catch (_) {
-        return undefined;
-    }
-}
-
-function saveSetting(key: string, value: string): void {
-    try {
-        window.localStorage.setItem(key, value);
-    } catch (_) {
-        // Storage can be unavailable (private windows, blocked site data). The panel works without it.
-    }
-}
 
 /**
  * The code panel docked at the bottom of the page.
